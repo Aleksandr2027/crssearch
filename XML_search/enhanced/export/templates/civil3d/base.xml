@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<civil3d_coordinate_system xmlns="http://schemas.autodesk.com/civil3d/2021/coordinate-system"
+                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:schemaLocation="http://schemas.autodesk.com/civil3d/2021/coordinate-system
+                                         http://schemas.autodesk.com/civil3d/2021/coordinate-system.xsd">
+    <!-- Метаданные и определение системы координат будут добавлены программно -->
+</civil3d_coordinate_system> 

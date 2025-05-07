@@ -1,0 +1,9 @@
+{
+  "type": "RuntimeError",
+  "message": "Ошибка тестирования новой версии",
+  "stack_trace": "  File \"C:\\Users\\Aleksandr\\.searh\\XML_search\\bot\\migration.py\", line 224, in migrate\n    raise RuntimeError(\"Ошибка тестирования новой версии\")\n",
+  "context": {
+    "stage": "migration"
+  },
+  "timestamp": "2025-04-11T10:37:49.651591"
+}

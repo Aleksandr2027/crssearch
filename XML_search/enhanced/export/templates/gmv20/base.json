@@ -1,0 +1,6 @@
+{
+    "schema": "http://schemas.geoworks.nl/gmv/2.0/coordinate-system.json",
+    "type": "coordinate_system",
+    "metadata": {},
+    "coordinate_system": {}
+} 

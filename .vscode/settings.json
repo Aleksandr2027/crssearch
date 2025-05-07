@@ -1,0 +1,76 @@
+{
+    "ai.rules": {
+        "sensitive_files": [".env", "*.key", "*.pem"],
+        "excluded_paths": ["__pycache__", "*.pyc", "*.log"],
+        "max_tokens_per_request": 8000,
+        "allowed_modifications": {
+            ".env": false,
+            ".env.example": true,
+            "*.py": true,
+            "*.md": true,
+            "*.json": true
+        },
+        "documentation_rules": {
+            "XML_search/spravka/Karta.md": {
+                "description": "Основная карта проекта с описанием всех компонентов",
+                "update_triggers": [
+                    "Добавление нового компонента",
+                    "Изменение структуры проекта",
+                    "Изменение взаимосвязей между компонентами",
+                    "Обновление статуса компонентов",
+                    "Изменение конфигурации"
+                ],
+                "sections_to_maintain": [
+                    "Структура проекта",
+                    "Основные компоненты",
+                    "Конфигурация и настройки",
+                    "Статус компонентов",
+                    "Иерархия приоритетов"
+                ],
+                "auto_update": true
+            },
+            "XML_search/spravka/read_edit_pool.md": {
+                "description": "Документация по миграции на улучшенный пул соединений",
+                "update_triggers": [
+                    "Изменения в db_pool.py",
+                    "Изменения в db_pool_enhanced.py",
+                    "Обновление конфигурации пула",
+                    "Изменения в метриках пула",
+                    "Статус миграции"
+                ],
+                "sections_to_maintain": [
+                    "План миграции",
+                    "Статус миграции",
+                    "Тестирование",
+                    "Мониторинг"
+                ],
+                "auto_update": true
+            },
+            "XML_search/spravka/read_pool.md": {
+                "description": "Техническая документация по работе с пулом соединений",
+                "update_triggers": [
+                    "Изменения в конфигурации пула",
+                    "Добавление новых метрик",
+                    "Изменения в мониторинге",
+                    "Обновление стратегий восстановления",
+                    "Изменения в обработке ошибок"
+                ],
+                "sections_to_maintain": [
+                    "Конфигурация пула",
+                    "Метрики и мониторинг",
+                    "Обработка ошибок",
+                    "Стратегии восстановления"
+                ],
+                "auto_update": true
+            }
+        },
+        "documentation_maintenance": {
+            "auto_update_on_changes": true,
+            "require_review": true,
+            "update_frequency": "on_change",
+            "versioning": true,
+            "backup_before_update": true
+        }
+    },
+    "mypy.dmypyExecutable": "C:\\Users\\Aleksandr\\.searh\\XML_search\\venv\\Scripts\\dmypy.exe"
+} 

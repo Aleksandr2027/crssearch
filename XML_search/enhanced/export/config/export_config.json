@@ -1,0 +1,52 @@
+{
+    "civil3d": {
+        "enabled": true,
+        "version": "2021",
+        "output_format": "xml",
+        "templates": {
+            "base": "templates/civil3d/base.xml",
+            "coordinate_system": "templates/civil3d/coordinate_system.xml"
+        },
+        "validation": {
+            "required_fields": ["srid", "auth_name", "auth_srid", "srtext", "proj4text"],
+            "max_text_length": 4096
+        }
+    },
+    "gmv20": {
+        "enabled": true,
+        "version": "2.0",
+        "output_format": "json",
+        "templates": {
+            "base": "templates/gmv20/base.json",
+            "coordinate_system": "templates/gmv20/coordinate_system.json"
+        },
+        "validation": {
+            "required_fields": ["srid", "auth_name", "auth_srid", "srtext"],
+            "max_text_length": 2048
+        }
+    },
+    "gmv25": {
+        "enabled": true,
+        "version": "2.5",
+        "output_format": "json",
+        "templates": {
+            "base": "templates/gmv25/base.json",
+            "coordinate_system": "templates/gmv25/coordinate_system.json"
+        },
+        "validation": {
+            "required_fields": ["srid", "auth_name", "auth_srid", "srtext", "proj4text"],
+            "max_text_length": 4096
+        }
+    },
+    "cache": {
+        "enabled": true,
+        "ttl_seconds": 3600,
+        "max_size": 1000
+    },
+    "metrics": {
+        "enabled": true,
+        "collection_interval": 60,
+        "export_timing": true,
+        "validation_timing": true
+    }
+} 

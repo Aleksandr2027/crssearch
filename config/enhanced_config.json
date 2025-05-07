@@ -1,0 +1,47 @@
+{
+    "metrics": {
+        "cleanup_interval": 300,
+        "max_age": 3600,
+        "enabled": true,
+        "cache_metrics": true,
+        "log_metrics": true,
+        "metrics_dir": "metrics"
+    },
+    "database": {
+        "min_connections": 5,
+        "max_connections": 20,
+        "connection_timeout": 30.0,
+        "idle_timeout": 600.0,
+        "health_check_interval": 300,
+        "pool_recycle": 3600,
+        "pool_pre_ping": true,
+        "max_lifetime": 3600.0,
+        "retry": {
+            "max_attempts": 3,
+            "delay": 1.0,
+            "enabled": true
+        }
+    },
+    "cache": {
+        "enabled": true,
+        "ttl": 3600,
+        "max_size": 1000,
+        "cleanup_interval": 300,
+        "min_cleanup_size": 800
+    },
+    "search": {
+        "max_results": 20,
+        "fuzzy_threshold": 0.85,
+        "transliteration_enabled": true
+    },
+    "logging": {
+        "log_dir": "logs",
+        "max_bytes": 10485760,
+        "backup_count": 5,
+        "log_level": "INFO",
+        "log_format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "date_format": "%Y-%m-%d %H:%M:%S",
+        "file_name_template": "bot_{date}.log",
+        "clean_interval": 7
+    }
+}

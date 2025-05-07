@@ -1,0 +1,47 @@
+{
+    "version": "1.0",
+    "description": "Конфигурация экспорта данных",
+    "formats": {
+        "civil3d": {
+            "enabled": true,
+            "template": "templates/civil3d_template.xml",
+            "validation": {
+                "required_attributes": ["name", "type", "coordinates"],
+                "coordinate_format": "x,y,z"
+            }
+        },
+        "gmv20": {
+            "enabled": true,
+            "template": "templates/gmv20_template.xml",
+            "validation": {
+                "required_attributes": ["id", "name", "geometry"],
+                "geometry_format": "wkt"
+            }
+        },
+        "gmv25": {
+            "enabled": true,
+            "template": "templates/gmv25_template.xml",
+            "validation": {
+                "required_attributes": ["id", "name", "geometry", "metadata"],
+                "geometry_format": "wkt",
+                "metadata_format": "json"
+            }
+        }
+    },
+    "metrics": {
+        "enabled": true,
+        "export_times": true,
+        "file_sizes": true,
+        "error_rates": true
+    },
+    "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "logs/export.log"
+    },
+    "error_handling": {
+        "retry_attempts": 3,
+        "retry_delay": 5,
+        "fallback_format": "json"
+    }
+}

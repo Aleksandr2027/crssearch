@@ -1,0 +1,36 @@
+{
+    "database": {
+        "min_connections": 2,
+        "max_connections": 10,
+        "health_check_interval": 60,
+        "host": "localhost",
+        "port": 5432,
+        "dbname": "gis",
+        "user": "postgres",
+        "password": "postgres",
+        "connect_timeout": 10,
+        "application_name": "telegram_bot",
+        "statement_timeout": 30000,
+        "idle_in_transaction_session_timeout": 30000
+    },
+    "metrics": {
+        "enabled": true,
+        "collection_interval": 60,
+        "retention_period": 86400
+    },
+    "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": null
+    },
+    "cache": {
+        "enabled": true,
+        "max_size": 1000,
+        "ttl": 3600
+    },
+    "search": {
+        "max_results": 100,
+        "timeout": 30,
+        "cache_enabled": true
+    }
+} 

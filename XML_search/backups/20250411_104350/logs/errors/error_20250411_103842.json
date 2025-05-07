@@ -1,0 +1,9 @@
+{
+  "type": "Exception",
+  "message": "Ошибка восстановления из бэкапа",
+  "stack_trace": "",
+  "context": {
+    "stage": "backup_restoration"
+  },
+  "timestamp": "2025-04-11T10:38:42.818361"
+}
