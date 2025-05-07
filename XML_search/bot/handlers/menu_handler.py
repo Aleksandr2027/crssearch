@@ -86,6 +86,7 @@ class MenuHandler(BaseHandler):
             context: Контекст обработчика
         """
         user_id = update.effective_user.id
+        self.logger.info(f"[MenuHandler.show_main_menu] user_id={user_id} — показ главного меню")
         self.log_access(user_id, 'show_main_menu')
         self.metrics.increment('main_menu_show')
         
@@ -115,12 +116,14 @@ class MenuHandler(BaseHandler):
         self.logger.info(f"[MenuHandler.handle_menu_command] Вход: user_id={getattr(update.effective_user, 'id', None)}, text={getattr(update.message, 'text', None)}")
         try:
             # Проверяем авторизацию
-            if not await self.auth_handler.check_auth(update, context):
+            is_auth = await self.auth_handler.check_auth(update, context)
+            self.logger.info(f"[MenuHandler.handle_menu_command] Авторизация: {is_auth}")
+            if not is_auth:
+                await update.message.reply_text("⚠️ Необходима авторизация. Пожалуйста, введите пароль:")
                 return States.AUTH
-            
             await self.show_main_menu(update, context)
+            self.logger.info(f"[MenuHandler.handle_menu_command] Главное меню показано пользователю {getattr(update.effective_user, 'id', None)}")
             return States.MAIN_MENU
-            
         except Exception as e:
             self.logger.error(f"Ошибка при обработке команды /menu: {e}")
             self.metrics.increment('menu_command_error')
@@ -191,7 +194,9 @@ class MenuHandler(BaseHandler):
         Публичный обработчик команды /start для регистрации в BotManager
         """
         self.logger.info(f"[MenuHandler.start] Вход: user_id={getattr(update.effective_user, 'id', None)}, text={getattr(update.message, 'text', None)}")
-        return await self.handle_menu_command(update, context)
+        result = await self.handle_menu_command(update, context)
+        self.logger.info(f"[MenuHandler.start] Результат: {result}")
+        return result
 
     async def help(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> States:
         """

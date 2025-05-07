@@ -11,7 +11,7 @@ from logging.handlers import RotatingFileHandler
 import traceback
 import sys
 from XML_search.enhanced.log_manager import LogManager
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 
 class BotLogger:
     """Расширенный логгер для бота с поддержкой структурированного логирования"""
@@ -45,7 +45,7 @@ class BotLogger:
         self.metrics_logger = self._setup_metrics_logger()
 
         # Метрики
-        self.metrics = MetricsCollector()
+        self.metrics = MetricsManager()
 
     def _setup_logger(self) -> logging.Logger:
         """

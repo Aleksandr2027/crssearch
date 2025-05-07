@@ -48,5 +48,27 @@
         "collection_interval": 60,
         "export_timing": true,
         "validation_timing": true
+    },
+    "export": {
+        "output_dir": "${XML_OUTPUT_DIR}",
+        "temp_dir": "${XML_TEMP_DIR}",
+        "max_file_size": "${MAX_FILE_SIZE}",
+        "formats": [
+            {
+                "name": "Civil3D XML",
+                "extension": ".xml",
+                "template": "civil3d/base.xml"
+            },
+            {
+                "name": "GMv20",
+                "extension": ".prj",
+                "template": "gmv20/base.json"
+            },
+            {
+                "name": "GMv25",
+                "extension": ".prj",
+                "template": "gmv25/base.json"
+            }
+        ]
     }
 } 

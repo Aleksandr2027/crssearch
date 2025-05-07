@@ -9,7 +9,7 @@ from XML_search.errors import DatabaseError
 from XML_search.config import DBConfig
 from XML_search.enhanced.db_manager import DatabaseManager
 from XML_search.enhanced.log_manager import LogManager
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.cache_manager import CacheManager
 
 class TestSearchEngine:
@@ -25,7 +25,7 @@ class TestSearchEngine:
     def test_init_with_custom_db_manager(self, mock_db_manager, mock_logger, mock_metrics):
         """Тест инициализации с пользовательским менеджером БД"""
         with patch('XML_search.core.search.search_engine.LogManager', return_value=mock_logger), \
-             patch('XML_search.core.search.search_engine.MetricsCollector', return_value=mock_metrics):
+             patch('XML_search.core.search.search_engine.MetricsManager', return_value=mock_metrics):
             
             engine = SearchEngine(db_manager=mock_db_manager)
             
@@ -37,7 +37,7 @@ class TestSearchEngine:
         mock_db = MagicMock(spec=DatabaseManager)
         
         with patch('XML_search.core.search.search_engine.LogManager', return_value=mock_logger), \
-             patch('XML_search.core.search.search_engine.MetricsCollector', return_value=mock_metrics), \
+             patch('XML_search.core.search.search_engine.MetricsManager', return_value=mock_metrics), \
              patch('XML_search.core.search.search_engine.DBConfig', return_value=db_config), \
              patch('XML_search.core.search.search_engine.DatabaseManager', return_value=mock_db) as mock_db_cls:
             
@@ -52,7 +52,7 @@ class TestSearchEngine:
         error_msg = "DB Error"
         
         with patch('XML_search.core.search.search_engine.LogManager', return_value=mock_logger), \
-             patch('XML_search.core.search.search_engine.MetricsCollector', return_value=mock_metrics), \
+             patch('XML_search.core.search.search_engine.MetricsManager', return_value=mock_metrics), \
              patch('XML_search.core.search.search_engine.DBConfig', return_value=db_config), \
              patch('XML_search.core.search.search_engine.DatabaseManager', side_effect=DatabaseError(error_msg)):
             
@@ -70,7 +70,7 @@ class TestSearchEngine:
         mock_cache.set.return_value = None
         
         with patch('XML_search.core.search.search_engine.LogManager', return_value=mock_logger), \
-             patch('XML_search.core.search.search_engine.MetricsCollector', return_value=mock_metrics), \
+             patch('XML_search.core.search.search_engine.MetricsManager', return_value=mock_metrics), \
              patch('XML_search.core.search.search_engine.CacheManager', return_value=mock_cache):
             
             engine = SearchEngine(db_manager=mock_db_manager)
@@ -91,7 +91,7 @@ class TestSearchEngine:
         mock_search_processor.search_coordinate_systems.return_value = sample_search_results
         
         with patch('XML_search.core.search.search_engine.LogManager', return_value=mock_logger), \
-             patch('XML_search.core.search.search_engine.MetricsCollector', return_value=mock_metrics), \
+             patch('XML_search.core.search.search_engine.MetricsManager', return_value=mock_metrics), \
              patch('XML_search.core.search.search_engine.CacheManager', return_value=mock_cache), \
              patch('XML_search.core.search.search_engine.CrsSearchBot', return_value=mock_search_processor):
             
@@ -115,7 +115,7 @@ class TestSearchEngine:
         filters = {"region": True}
         
         with patch('XML_search.core.search.search_engine.LogManager', return_value=mock_logger), \
-             patch('XML_search.core.search.search_engine.MetricsCollector', return_value=mock_metrics), \
+             patch('XML_search.core.search.search_engine.MetricsManager', return_value=mock_metrics), \
              patch('XML_search.core.search.search_engine.CacheManager', return_value=mock_cache), \
              patch('XML_search.core.search.search_engine.CrsSearchBot', return_value=mock_search_processor):
             
@@ -146,7 +146,7 @@ class TestSearchEngine:
         mock_search_processor.search_coordinate_systems.side_effect = Exception(error_message)
         
         with patch('XML_search.core.search.search_engine.LogManager', return_value=mock_logger), \
-             patch('XML_search.core.search.search_engine.MetricsCollector', return_value=mock_metrics), \
+             patch('XML_search.core.search.search_engine.MetricsManager', return_value=mock_metrics), \
              patch('XML_search.core.search.search_engine.CacheManager', return_value=mock_cache), \
              patch('XML_search.core.search.search_engine.CrsSearchBot', return_value=mock_search_processor):
             

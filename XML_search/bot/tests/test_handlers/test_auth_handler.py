@@ -9,7 +9,7 @@ from XML_search.bot.handlers.auth_handler import AuthHandler
 from XML_search.bot.states import States
 from XML_search.config import TelegramConfig
 from XML_search.enhanced.db_manager import DatabaseManager
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.bot.keyboards.main_keyboard import MainKeyboard
 
 class TestAuthHandlerImpl(AuthHandler):

@@ -35,21 +35,25 @@ class ExportHandler(BaseHandler):
             update: Обновление от Telegram
             context: Контекст обновления
         """
-        if not update.effective_user:
-            return
-            
-        # Логируем начало обработки
-        self.log_access(update.effective_user.id, 'export_command')
-        
-        # Проверяем авторизацию
-        user_data = await self._get_user_data(context)
-        if not user_data.get('auth', False):
-            await update.effective_message.reply_text(self.messages['auth_request'])
-            await self.set_user_state(context, States.AUTH, update)
-            return
-            
-        # Показываем меню экспорта
-        await self._show_export_menu(update, context)
+        try:
+            if not update.effective_user:
+                return
+            # Логируем начало обработки
+            self.log_access(update.effective_user.id, 'export_command')
+            # Проверяем авторизацию
+            user_data = await self._get_user_data(context)
+            if not user_data.get('auth', False):
+                await update.effective_message.reply_text(self.messages['auth_request'])
+                await self.set_user_state(context, States.AUTH, update)
+                return
+            # Показываем меню экспорта
+            await self._show_export_menu(update, context)
+        except Exception as e:
+            self.logger.error(f"Ошибка в ExportHandler.handle: {e}", exc_info=True)
+            self.metrics.increment('export_command_error')
+            error_message = self.messages.get('error', 'Произошла ошибка. Пожалуйста, попробуйте позже.')
+            if update and update.effective_message:
+                await update.effective_message.reply_text(error_message)
         
     async def handle_callback(self, update: Update, context: CallbackContext) -> None:
         """

@@ -1,14 +1,14 @@
 {
     "database": {
-        "min_connections": 2,
-        "max_connections": 10,
-        "health_check_interval": 60,
-        "host": "localhost",
-        "port": 5432,
-        "dbname": "gis",
-        "user": "postgres",
-        "password": "postgres",
-        "connect_timeout": 10,
+        "min_connections": "${DB_MIN_CONNECTIONS}",
+        "max_connections": "${DB_MAX_CONNECTIONS}",
+        "health_check_interval": "${DB_HEALTH_CHECK_INTERVAL}",
+        "host": "${DB_HOST}",
+        "port": "${DB_PORT}",
+        "dbname": "${DB_NAME}",
+        "user": "${DB_USER}",
+        "password": "${DB_PASSWORD}",
+        "connect_timeout": "${DB_CONNECTION_TIMEOUT}",
         "application_name": "telegram_bot",
         "statement_timeout": 30000,
         "idle_in_transaction_session_timeout": 30000
@@ -19,18 +19,18 @@
         "retention_period": 86400
     },
     "logging": {
-        "level": "INFO",
-        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "level": "${LOG_LEVEL}",
+        "format": "${LOG_FORMAT}",
         "file": null
     },
     "cache": {
-        "enabled": true,
-        "max_size": 1000,
-        "ttl": 3600
+        "enabled": "${CACHE_ENABLED}",
+        "max_size": "${CACHE_MAX_SIZE}",
+        "ttl": "${CACHE_TTL}"
     },
     "search": {
-        "max_results": 100,
-        "timeout": 30,
-        "cache_enabled": true
+        "max_results": "${SEARCH_MAX_RESULTS}",
+        "timeout": "${SEARCH_TIMEOUT}",
+        "cache_enabled": "${CACHE_ENABLED}"
     }
 } 

@@ -9,7 +9,7 @@ from XML_search.enhanced.export.exporters.civil3d import Civil3DExporter
 from XML_search.enhanced.export.exporters.gmv20 import GMv20Exporter
 from XML_search.enhanced.export.exporters.gmv25 import GMv25Exporter
 from XML_search.bot.handlers.export_handler import ExportHandler
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.log_manager import LogManager
 from XML_search.enhanced.cache_manager import CacheManager
 from XML_search.enhanced.db_manager import DatabaseManager
@@ -19,7 +19,7 @@ from XML_search.enhanced.export.exceptions import ExportError, ValidationError
 @pytest.fixture
 def mock_metrics():
     """Мок для сборщика метрик"""
-    metrics = MagicMock(spec=MetricsCollector)
+    metrics = MagicMock(spec=MetricsManager)
     metrics.increment = MagicMock()
     metrics.timing = MagicMock()
     # Добавляем контекстный менеджер для timing

@@ -9,7 +9,7 @@ from telegram import (
     ReplyKeyboardMarkup,
     KeyboardButton
 )
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.log_manager import LogManager
 from XML_search.enhanced.cache_manager import CacheManager
 from XML_search.bot.keyboards.main_keyboard import (
@@ -26,7 +26,7 @@ class KeyboardManager:
     
     def __init__(self):
         """Инициализация менеджера клавиатур"""
-        self.metrics = MetricsCollector()
+        self.metrics = MetricsManager()
         self.logger = LogManager().get_logger(__name__)
         self.cache = CacheManager()
         

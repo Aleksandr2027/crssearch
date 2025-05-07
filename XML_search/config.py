@@ -103,17 +103,22 @@ class TelegramConfig:
     TOKEN = os.getenv('TELEGRAM_TOKEN')
     if not TOKEN:
         logger.error("TELEGRAM_TOKEN не найден в TelegramConfig")
-    ACCESS_PASSWORD = os.getenv('ACCESS_PASSWORD', '123')
+    ACCESS_PASSWORD = os.getenv('ACCESS_PASSWORD', '')
+    ADMIN_IDS = [int(x) for x in os.getenv('ADMIN_IDS', '').split(',') if x.strip().isdigit()]
     
     # Параметры подключения к БД
     DB_PARAMS = {
-        "dbname": "gis",
-        "user": "postgres",
-        "password": "postgres",
-        "host": "localhost",
-        "port": "5432",
+        "dbname": os.getenv('DB_NAME', 'gis'),
+        "user": os.getenv('DB_USER', 'postgres'),
+        "password": os.getenv('DB_PASSWORD', 'postgres'),
+        "host": os.getenv('DB_HOST', 'localhost'),
+        "port": os.getenv('DB_PORT', '5432'),
+        "min_connections": int(os.getenv('DB_MIN_CONNECTIONS', 2)),
+        "max_connections": int(os.getenv('DB_MAX_CONNECTIONS', 10)),
+        "connect_timeout": float(os.getenv('DB_CONNECTION_TIMEOUT', 30.0)),
+        "idle_timeout": float(os.getenv('DB_IDLE_TIMEOUT', 300.0)),
+        "health_check_interval": int(os.getenv('DB_HEALTH_CHECK_INTERVAL', 60)),
     }
-    ADMIN_ID = int(os.getenv('ADMIN_ID', 0))
 
 class LogConfig:
     """Конфигурация логирования"""

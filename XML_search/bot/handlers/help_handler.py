@@ -33,17 +33,21 @@ class HelpHandler(BaseHandler):
             update: Обновление от Telegram
             context: Контекст обновления
         """
-        if not update.effective_user:
-            return
-            
-        # Логируем начало обработки
-        self.log_access(update.effective_user.id, 'help_command')
-        
-        # Отправляем сообщение с помощью
-        await update.effective_message.reply_text(
-            self.messages['help'],
-            parse_mode='Markdown'
-        )
-        
-        # Сбрасываем состояние
-        await self.clear_user_state(context) 
+        try:
+            if not update.effective_user:
+                return
+            # Логируем начало обработки
+            self.log_access(update.effective_user.id, 'help_command')
+            # Отправляем сообщение с помощью
+            await update.effective_message.reply_text(
+                self.messages['help'],
+                parse_mode='Markdown'
+            )
+            # Сбрасываем состояние
+            await self.clear_user_state(context)
+        except Exception as e:
+            self.logger.error(f"Ошибка в HelpHandler.handle: {e}", exc_info=True)
+            self.metrics.increment('help_command_error')
+            error_message = self.messages.get('error', 'Произошла ошибка. Пожалуйста, попробуйте позже.')
+            if update and update.effective_message:
+                await update.effective_message.reply_text(error_message) 

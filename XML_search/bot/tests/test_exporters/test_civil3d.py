@@ -9,7 +9,7 @@ from XML_search.errors import ValidationError, XMLProcessingError, ExportError
 from XML_search.enhanced.db_manager import DatabaseManager
 from XML_search.config import DBConfig
 from XML_search.enhanced.log_manager import LogManager
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
@@ -32,7 +32,7 @@ def mock_logger():
 @pytest.fixture
 def mock_metrics():
     """Фикстура для создания мока сборщика метрик"""
-    metrics = MagicMock(spec=MetricsCollector)
+    metrics = MagicMock(spec=MetricsManager)
     return metrics
 
 @pytest.fixture
@@ -55,7 +55,7 @@ def config():
 def exporter(config, mock_db_manager, mock_logger, mock_metrics):
     """Фикстура для создания экспортера"""
     with patch('XML_search.enhanced.log_manager.LogManager', return_value=mock_logger), \
-         patch('XML_search.enhanced.metrics.MetricsCollector', return_value=mock_metrics):
+         patch('XML_search.enhanced.metrics_manager.MetricsManager', return_value=mock_metrics):
         return Civil3DExporter(config, db_manager=mock_db_manager)
 
 class TestCivil3DExporter:
@@ -64,7 +64,7 @@ class TestCivil3DExporter:
     def test_init_with_custom_db_manager(self, config, mock_db_manager, mock_logger, mock_metrics):
         """Тест инициализации с пользовательским менеджером БД"""
         with patch('XML_search.enhanced.log_manager.LogManager', return_value=mock_logger), \
-             patch('XML_search.enhanced.metrics.MetricsCollector', return_value=mock_metrics):
+             patch('XML_search.enhanced.metrics_manager.MetricsManager', return_value=mock_metrics):
             exporter = Civil3DExporter(config, db_manager=mock_db_manager)
             
             assert exporter.db_manager == mock_db_manager
@@ -78,7 +78,7 @@ class TestCivil3DExporter:
         mock_db = MagicMock(spec=DatabaseManager)
         
         with patch('XML_search.enhanced.log_manager.LogManager', return_value=mock_logger), \
-             patch('XML_search.enhanced.metrics.MetricsCollector', return_value=mock_metrics), \
+             patch('XML_search.enhanced.metrics_manager.MetricsManager', return_value=mock_metrics), \
              patch('XML_search.enhanced.db_manager.DatabaseManager', return_value=mock_db):
             
             exporter = Civil3DExporter(config)
@@ -92,7 +92,7 @@ class TestCivil3DExporter:
     def test_db_manager_error_handling(self, config, mock_logger, mock_metrics):
         """Тест обработки ошибок при создании менеджера БД"""
         with patch('XML_search.enhanced.log_manager.LogManager', return_value=mock_logger), \
-             patch('XML_search.enhanced.metrics.MetricsCollector', return_value=mock_metrics), \
+             patch('XML_search.enhanced.metrics_manager.MetricsManager', return_value=mock_metrics), \
              patch('XML_search.enhanced.db_manager.DatabaseManager', side_effect=Exception("DB Error")):
             
             with pytest.raises(ExportError) as exc_info:

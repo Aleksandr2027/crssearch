@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
 from pathlib import Path
 from .log_manager import LogManager
+import os
+import re
 
 logger = LogManager().get_logger(__name__)
 
@@ -35,6 +37,12 @@ class PoolConfig:
     max_idle_time: int = 300
 
     def __post_init__(self):
+        self.retries = int(self.retries)
+        self.backoff_factor = float(self.backoff_factor)
+        self.backoff_max = int(self.backoff_max)
+        self.health_check_timeout = int(self.health_check_timeout)
+        self.max_lifetime = int(self.max_lifetime)
+        self.max_idle_time = int(self.max_idle_time)
         if self.retries < 0:
             raise ConfigValidationError("retries должно быть неотрицательным")
         if self.backoff_factor <= 0:
@@ -57,32 +65,46 @@ class SSLConfig:
     key: Optional[str] = None
     ca: Optional[str] = None
 
+    def __post_init__(self):
+        self.enabled = bool(self.enabled) if not isinstance(self.enabled, bool) else self.enabled
+        self.verify = bool(self.verify) if not isinstance(self.verify, bool) else self.verify
+
 @dataclass
 class DatabaseConfig:
     """Конфигурация базы данных"""
-    min_connections: int = 2
-    max_connections: int = 10
-    health_check_interval: int = 60
-    host: str = "localhost"
-    port: int = 5432
-    dbname: str = "gis"
-    user: str = "postgres"
-    password: str = "postgres"
-    connect_timeout: int = 10
-    application_name: str = "telegram_bot"
-    statement_timeout: int = 30000
-    idle_in_transaction_session_timeout: int = 30000
+    min_connections: int
+    max_connections: int
+    health_check_interval: int
+    host: str
+    port: int
+    dbname: str
+    user: str
+    password: str
+    connect_timeout: float
+    application_name: str
+    statement_timeout: int
+    idle_in_transaction_session_timeout: int
     pool: PoolConfig = field(default_factory=PoolConfig)
     ssl: SSLConfig = field(default_factory=SSLConfig)
 
     def __post_init__(self):
         """Валидация параметров конфигурации"""
+        # Явное приведение типов
+        try:
+            self.min_connections = int(self.min_connections)
+            self.max_connections = int(self.max_connections)
+            self.health_check_interval = int(self.health_check_interval)
+            self.port = int(self.port)
+            self.connect_timeout = float(self.connect_timeout)
+            self.statement_timeout = int(self.statement_timeout)
+            self.idle_in_transaction_session_timeout = int(self.idle_in_transaction_session_timeout)
+            # ... остальные числовые поля ...
+        except Exception as e:
+            raise ValueError(f"Ошибка приведения типов в DatabaseConfig: {e}")
         if self.min_connections < 1:
-            raise ConfigValidationError("min_connections должно быть больше 0")
+            raise ValueError("min_connections должно быть >= 1")
         if self.max_connections < self.min_connections:
-            raise ConfigValidationError("max_connections должно быть больше или равно min_connections")
-        if self.health_check_interval < 1:
-            raise ConfigValidationError("health_check_interval должно быть больше 0")
+            raise ValueError("max_connections должно быть >= min_connections")
         if not isinstance(self.port, int) or not (1024 <= self.port <= 65535):
             raise ConfigValidationError("port должен быть числом от 1024 до 65535")
         if not self.dbname:
@@ -96,6 +118,17 @@ class DatabaseConfig:
     def from_dict(cls, data: Dict[str, Any]) -> 'DatabaseConfig':
         """Создание конфигурации из словаря"""
         try:
+            # Приведение типов до создания экземпляра
+            data = dict(data)  # копия
+            data['min_connections'] = int(data['min_connections'])
+            data['max_connections'] = int(data['max_connections'])
+            data['health_check_interval'] = int(data['health_check_interval'])
+            data['port'] = int(data['port'])
+            data['connect_timeout'] = float(data['connect_timeout'])
+            data['statement_timeout'] = int(data['statement_timeout'])
+            data['idle_in_transaction_session_timeout'] = int(data['idle_in_transaction_session_timeout'])
+            # ... остальные числовые поля ...
+            
             # Извлекаем конфигурации пула и SSL
             pool_data = data.pop('pool', {})
             ssl_data = data.pop('ssl', {})
@@ -138,6 +171,9 @@ class MetricsConfig:
     retention_period: int = 86400
 
     def __post_init__(self):
+        self.enabled = bool(self.enabled) if not isinstance(self.enabled, bool) else self.enabled
+        self.collection_interval = int(self.collection_interval)
+        self.retention_period = int(self.retention_period)
         if self.collection_interval < 1:
             raise ConfigValidationError("collection_interval должно быть больше 0")
         if self.retention_period < self.collection_interval:
@@ -151,6 +187,7 @@ class LogManagerConfig:
     file: Optional[str] = None
 
     def __post_init__(self):
+        self.level = str(self.level)
         valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
         if self.level not in valid_levels:
             raise ConfigValidationError(f"level должен быть одним из: {valid_levels}")
@@ -163,6 +200,9 @@ class CacheManagerConfig:
     ttl: int = 3600
 
     def __post_init__(self):
+        self.enabled = bool(self.enabled) if not isinstance(self.enabled, bool) else self.enabled
+        self.max_size = int(self.max_size)
+        self.ttl = int(self.ttl)
         if self.max_size < 1:
             raise ConfigValidationError("max_size должно быть больше 0")
         if self.ttl < 1:
@@ -176,6 +216,9 @@ class SearchConfig:
     cache_enabled: bool = True
 
     def __post_init__(self):
+        self.max_results = int(self.max_results)
+        self.timeout = int(self.timeout)
+        self.cache_enabled = bool(self.cache_enabled) if not isinstance(self.cache_enabled, bool) else self.cache_enabled
         if self.max_results < 1:
             raise ConfigValidationError("max_results должно быть больше 0")
         if self.timeout < 1:
@@ -185,11 +228,11 @@ class SearchConfig:
 class EnhancedConfig:
     """Расширенная конфигурация"""
     config_path: str
-    database: DatabaseConfig = field(default_factory=DatabaseConfig)
-    metrics: MetricsConfig = field(default_factory=MetricsConfig)
-    logging: LogManagerConfig = field(default_factory=LogManagerConfig)
-    cache: CacheManagerConfig = field(default_factory=CacheManagerConfig)
-    search: SearchConfig = field(default_factory=SearchConfig)
+    database: Optional[DatabaseConfig] = None
+    metrics: Optional[MetricsConfig] = None
+    logging: Optional[LogManagerConfig] = None
+    cache: Optional[CacheManagerConfig] = None
+    search: Optional[SearchConfig] = None
 
     def __post_init__(self):
         """Загрузка конфигурации после инициализации"""
@@ -201,6 +244,26 @@ class EnhancedConfig:
         missing_sections = required_sections - set(data.keys())
         if missing_sections:
             raise ConfigValidationError(f"Отсутствуют обязательные секции: {missing_sections}")
+
+    def substitute_env_vars(self, obj):
+        """
+        Рекурсивно заменяет строки вида ${ENV_VAR} на значения из переменных окружения.
+        """
+        if isinstance(obj, dict):
+            return {k: self.substitute_env_vars(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self.substitute_env_vars(v) for v in obj]
+        elif isinstance(obj, str):
+            match = re.fullmatch(r"\$\{([A-Z0-9_]+)\}", obj)
+            if match:
+                env_var = match.group(1)
+                value = os.getenv(env_var)
+                if value is None:
+                    raise ValueError(f"Переменная окружения {env_var} не задана, требуется для конфигурации")
+                return value
+            return obj
+        else:
+            return obj
 
     def _load_config(self) -> None:
         """Загрузка конфигурации из файла"""
@@ -215,22 +278,35 @@ class EnhancedConfig:
                 except json.JSONDecodeError as e:
                     raise ConfigLoadError(f"Ошибка парсинга JSON: {e}")
 
+            # Подстановка переменных окружения
+            data = self.substitute_env_vars(data)
+
             self._validate_json(data)
-                
+
             # Загружаем конфигурации из JSON
             if 'database' in data:
                 self.database = DatabaseConfig.from_dict(data['database'])
+            else:
+                raise ConfigValidationError("Секция 'database' отсутствует в конфиге")
             if 'metrics' in data:
                 self.metrics = MetricsConfig(**data['metrics'])
+            else:
+                raise ConfigValidationError("Секция 'metrics' отсутствует в конфиге")
             if 'logging' in data:
                 self.logging = LogManagerConfig(**data['logging'])
+            else:
+                raise ConfigValidationError("Секция 'logging' отсутствует в конфиге")
             if 'cache' in data:
                 self.cache = CacheManagerConfig(**data['cache'])
+            else:
+                raise ConfigValidationError("Секция 'cache' отсутствует в конфиге")
             if 'search' in data:
                 self.search = SearchConfig(**data['search'])
-                
+            else:
+                raise ConfigValidationError("Секция 'search' отсутствует в конфиге")
+
             logger.info("Конфигурация успешно загружена")
-            
+
         except ConfigError as e:
             logger.error(f"Ошибка конфигурации: {e}")
             raise

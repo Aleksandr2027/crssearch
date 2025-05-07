@@ -6,7 +6,7 @@ import pytest
 from unittest.mock import MagicMock, AsyncMock
 from XML_search.enhanced.db_manager import DatabaseManager
 from XML_search.enhanced.log_manager import LogManager
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.cache_manager import CacheManager
 from XML_search.crs_search import CrsSearchBot
 from XML_search.config import DBConfig

@@ -22,32 +22,40 @@ class BotConfig:
     """Конфигурация бота"""
     
     # Токен бота
-    BOT_TOKEN: str = "7805203567:AAEYMeCWrU6f9OnzY3xgvVDpPrClnLeQcEI"
+    BOT_TOKEN: str = os.getenv('TELEGRAM_TOKEN', '')
     
     # Пути к конфигурационным файлам
     BASE_DIR: Path = Path(__file__).parent.parent
-    DB_CONFIG_PATH: str = str(BASE_DIR / "enhanced" / "config" / "database.json")
+    DB_CONFIG_PATH: str = os.getenv('DB_CONFIG_PATH', str(BASE_DIR / "enhanced" / "config" / "database.json"))
+    EXPORT_CONFIG_PATH: str = os.getenv('EXPORT_CONFIG_PATH', str(BASE_DIR / "config" / "export_config.json"))
     
     # Настройки базы данных
-    DB_HOST: str = "localhost"
-    DB_PORT: int = 5432
-    DB_NAME: str = "gis"
-    DB_USER: str = "postgres"
-    DB_PASSWORD: str = "postgres"
+    DB_HOST: str = os.getenv('DB_HOST', 'localhost')
+    DB_PORT: int = int(os.getenv('DB_PORT', 5432))
+    DB_NAME: str = os.getenv('DB_NAME', 'gis')
+    DB_USER: str = os.getenv('DB_USER', 'postgres')
+    DB_PASSWORD: str = os.getenv('DB_PASSWORD', 'postgres')
+    DB_MIN_CONNECTIONS: int = int(os.getenv('DB_MIN_CONNECTIONS', 2))
+    DB_MAX_CONNECTIONS: int = int(os.getenv('DB_MAX_CONNECTIONS', 10))
+    DB_CONNECTION_TIMEOUT: float = float(os.getenv('DB_CONNECTION_TIMEOUT', 30.0))
+    DB_IDLE_TIMEOUT: float = float(os.getenv('DB_IDLE_TIMEOUT', 300.0))
+    DB_HEALTH_CHECK_INTERVAL: int = int(os.getenv('DB_HEALTH_CHECK_INTERVAL', 60))
     
     # Настройки логирования
-    LOG_LEVEL: str = "INFO"
-    LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    LOG_FILE: Optional[str] = None
+    LOG_LEVEL: str = os.getenv('LOG_LEVEL', 'INFO')
+    LOG_FORMAT: str = os.getenv('LOG_FORMAT', '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    LOG_FILE: Optional[str] = os.getenv('LOG_FILE', None)
+    HTTPS_LOG_LEVEL: str = os.getenv('HTTPS_LOG_LEVEL', 'WARNING')
+    LOG_DIR: str = os.getenv('LOG_DIR', 'logs')
     
     # Настройки кэширования
-    CACHE_ENABLED: bool = True
-    CACHE_TTL: int = 3600
-    CACHE_MAX_SIZE: int = 1000
+    CACHE_ENABLED: bool = os.getenv('CACHE_ENABLED', 'True').lower() == 'true'
+    CACHE_TTL: int = int(os.getenv('CACHE_TTL', 3600))
+    CACHE_MAX_SIZE: int = int(os.getenv('CACHE_MAX_SIZE', 1000))
     
     # Настройки поиска
-    SEARCH_MAX_RESULTS: int = 100
-    SEARCH_TIMEOUT: int = 30
+    SEARCH_MAX_RESULTS: int = int(os.getenv('SEARCH_MAX_RESULTS', 100))
+    SEARCH_TIMEOUT: int = int(os.getenv('SEARCH_TIMEOUT', 30))
     
     # Настройки базы данных
     DB_CONFIG = enhanced_config.database
@@ -82,6 +90,10 @@ class BotConfig:
     
     # Настройки авторизации
     AUTH_CONFIG: AuthConfig = field(default_factory=AuthConfig)
+    ACCESS_PASSWORD: str = os.getenv('ACCESS_PASSWORD', '123')
+    
+    # Telegram admin ids
+    ADMIN_IDS: list = field(default_factory=lambda: [int(x) for x in os.getenv('ADMIN_IDS', '').split(',') if x.strip().isdigit()])
     
     # Настройки сообщений
     MESSAGES: Dict[str, str] = field(default_factory=lambda: {
@@ -96,16 +108,11 @@ class BotConfig:
     
     def __post_init__(self):
         """Валидация конфигурации после инициализации"""
-        # Проверяем существование директории конфигурации
         config_dir = Path(self.DB_CONFIG_PATH).parent
         if not config_dir.exists():
             config_dir.mkdir(parents=True, exist_ok=True)
-            
-        # Проверяем токен бота
         if not self.BOT_TOKEN:
             raise ValueError("BOT_TOKEN не может быть пустым")
-            
-        # Проверяем настройки базы данных
         if not self.DB_HOST:
             raise ValueError("DB_HOST не может быть пустым")
         if not isinstance(self.DB_PORT, int) or not (1024 <= self.DB_PORT <= 65535):
@@ -116,19 +123,13 @@ class BotConfig:
             raise ValueError("DB_USER не может быть пустым")
         if not self.DB_PASSWORD:
             raise ValueError("DB_PASSWORD не может быть пустым")
-            
-        # Проверяем настройки логирования
         valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
         if self.LOG_LEVEL not in valid_levels:
             raise ValueError(f"LOG_LEVEL должен быть одним из: {valid_levels}")
-            
-        # Проверяем настройки кэширования
         if self.CACHE_TTL < 1:
             raise ValueError("CACHE_TTL должно быть больше 0")
         if self.CACHE_MAX_SIZE < 1:
             raise ValueError("CACHE_MAX_SIZE должно быть больше 0")
-            
-        # Проверяем настройки поиска
         if self.SEARCH_MAX_RESULTS < 1:
             raise ValueError("SEARCH_MAX_RESULTS должно быть больше 0")
         if self.SEARCH_TIMEOUT < 1:

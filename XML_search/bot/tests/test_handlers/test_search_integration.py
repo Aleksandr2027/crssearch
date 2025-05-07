@@ -11,7 +11,7 @@ from XML_search.bot.handlers.search_handler import SearchHandler
 from XML_search.core.search import SearchEngine, SearchTransliterator, SearchUtils
 from XML_search.enhanced.db_manager import DatabaseManager
 from XML_search.enhanced.cache_manager import CacheManager
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.log_manager import LogManager
 from XML_search.bot.states import States
 from XML_search.config import DBConfig
@@ -180,8 +180,8 @@ def mock_cache_manager():
 
 @pytest.fixture
 def mock_metrics():
-    """Создание мока для MetricsCollector"""
-    metrics = MagicMock(spec=MetricsCollector)
+    """Создание мока для MetricsManager"""
+    metrics = MagicMock(spec=MetricsManager)
     metrics.increment = Mock()
     metrics.record_timing = Mock()
     return metrics

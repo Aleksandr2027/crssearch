@@ -9,7 +9,7 @@ from telegram.ext import ContextTypes
 from XML_search.bot.handlers.export_handler import ExportHandler
 from XML_search.bot.handlers.exceptions import ExportError, ValidationError, ExporterError
 from XML_search.enhanced.db_manager import DatabaseManager
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.export.export_manager import ExportManager
 from XML_search.enhanced.export.exporters.civil3d import Civil3DExporter
 from XML_search.enhanced.export.exporters.gmv20 import GMv20Exporter
@@ -23,7 +23,7 @@ class TestExportHandler:
         self.db_manager = Mock(spec=DatabaseManager)
         
         # Создаем обработчик
-        with patch('XML_search.enhanced.metrics.MetricsCollector') as metrics_mock, \
+        with patch('XML_search.enhanced.metrics_manager.MetricsManager') as metrics_mock, \
              patch('XML_search.enhanced.cache_manager.CacheManager') as cache_mock, \
              patch('XML_search.enhanced.log_manager.LogManager') as log_mock, \
              patch('XML_search.bot.utils.validation_utils.ValidationManager') as validation_mock, \

@@ -8,7 +8,7 @@ from telegram.ext import ContextTypes, MessageHandler
 from XML_search.bot.handlers.coord_handler import CoordHandler
 from XML_search.bot.states import States
 from XML_search.enhanced.db_manager import DatabaseManager
-from XML_search.enhanced.metrics import MetricsCollector
+from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.bot.utils.validation_utils import ValidationResult, Coordinates
 
 class TestCoordHandlerImpl(CoordHandler):
@@ -26,8 +26,8 @@ def mock_db_manager():
 
 @pytest.fixture
 def mock_metrics():
-    """Фикстура для создания мока MetricsCollector"""
-    metrics = MagicMock(spec=MetricsCollector)
+    """Фикстура для создания мока MetricsManager"""
+    metrics = MagicMock(spec=MetricsManager)
     return metrics
 
 @pytest.fixture

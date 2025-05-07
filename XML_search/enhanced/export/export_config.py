@@ -25,6 +25,13 @@ class ExporterConfig:
     max_retries: int = 3
     retry_delay: float = 1.0
 
+    def __post_init__(self):
+        self.enabled = bool(self.enabled) if not isinstance(self.enabled, bool) else self.enabled
+        self.cache_enabled = bool(self.cache_enabled) if not isinstance(self.cache_enabled, bool) else self.cache_enabled
+        self.cache_ttl = int(self.cache_ttl)
+        self.max_retries = int(self.max_retries)
+        self.retry_delay = float(self.retry_delay)
+
 @dataclass
 class ExportConfig:
     """Конфигурация экспорта"""
@@ -56,6 +63,10 @@ class ExportConfig:
         # Преобразуем пути в Path объекты
         self.output_dir = Path(self.output_dir)
         self.temp_dir = Path(self.temp_dir)
+        self.max_file_size = int(self.max_file_size)
+        self.json_indent = int(self.json_indent)
+        self.cache_enabled = bool(self.cache_enabled) if not isinstance(self.cache_enabled, bool) else self.cache_enabled
+        self.cache_ttl = int(self.cache_ttl)
 
 class ExportConfigManager:
     """Класс для работы с конфигурацией экспорта"""
