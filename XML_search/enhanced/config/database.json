@@ -11,7 +11,25 @@
         "connect_timeout": "${DB_CONNECTION_TIMEOUT}",
         "application_name": "telegram_bot",
         "statement_timeout": 30000,
-        "idle_in_transaction_session_timeout": 30000
+        "idle_in_transaction_session_timeout": 30000,
+        "pool": {
+            "min_connections": "${DB_MIN_CONNECTIONS}",
+            "max_connections": "${DB_MAX_CONNECTIONS}",
+            "retries": 3,
+            "backoff_factor": 1.5,
+            "backoff_max": 30,
+            "health_check_query": "SELECT 1",
+            "health_check_timeout": 5,
+            "max_lifetime": 3600,
+            "max_idle_time": 300
+        },
+        "ssl": {
+            "enabled": false,
+            "verify": true,
+            "cert": null,
+            "key": null,
+            "ca": null
+        }
     },
     "metrics": {
         "enabled": true,

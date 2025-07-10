@@ -9,10 +9,10 @@
         "connect_timeout": "${DB_CONNECTION_TIMEOUT}",
         "statement_timeout": 30000,
         "idle_in_transaction_session_timeout": 30000,
-        "min_connections": "${DB_MIN_CONNECTIONS}",
-        "max_connections": "${DB_MAX_CONNECTIONS}",
         "health_check_interval": "${DB_HEALTH_CHECK_INTERVAL}",
         "pool": {
+            "min_connections": "${DB_MIN_CONNECTIONS}",
+            "max_connections": "${DB_MAX_CONNECTIONS}",
             "retries": 3,
             "backoff_factor": 1.5,
             "backoff_max": 30,

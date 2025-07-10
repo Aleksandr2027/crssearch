@@ -1,0 +1,394 @@
+(venv) PS C:\Users\Aleksandr\.searh> python XML_search/main.py
+2025-05-30 10:53:43,020 [INFO] XML_search.enhanced.config_enhanced: Конфигурация успешно загружена
+2025-05-30 10:53:43,025 [INFO] XML_search.bot.bot_manager: Все обработчики успешно инициализированы
+C:\Users\Aleksandr\.searh\XML_search\bot\bot_manager.py:231: PTBUserWarning: If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message. Read this FAQ entry to learn more about the per_* settings: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do.
+  return ConversationHandler(
+2025-05-30 10:53:43,100 [INFO] XML_search.bot.bot_manager: [BotManager] ConversationHandler states: {<States.AUTH: 2>: [MessageHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper]], <States.MAIN_MENU: 3>: [MessageHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper]], <States.SEARCH_INPUT: 6>: [CallbackQueryHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper], MessageHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper]], <States.SEARCH_RESULTS: 7>: [CallbackQueryHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper], MessageHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper]], <States.WAITING_EXPORT: 12>: [CallbackQueryHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper], CallbackQueryHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper]], <States.COORD_INPUT: 9>: [MessageHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper]], <States.SEARCH_ERROR: 8>: [MessageHandler[callback=BotManager._setup_conversation_handler.<locals>.log_wrapper.<locals>.wrapper]]}
+2025-05-30 10:53:43,101 [INFO] XML_search.bot.bot_manager: ConversationHandler зарегистрирован
+2025-05-30 10:53:43,101 [INFO] XML_search.bot.bot_manager: InlineQueryHandler зарегистрирован
+2025-05-30 10:53:43,102 [INFO] XML_search.bot.bot_manager: Callback-обработчики успешно зарегистрированы
+2025-05-30 10:53:43,102 [INFO] XML_search.bot.bot_manager: Все обработчики успешно зарегистрированы
+2025-05-30 10:53:43,102 [INFO] XML_search.bot.bot_manager: BotManager успешно инициализирован
+2025-05-30 10:53:43,103 [INFO] root: 🚀 Запуск бота...
+2025-05-30 10:53:43,103 [INFO] XML_search.bot.bot_manager: Запуск бота (polling)...
+2025-05-30 10:53:43,106 [DEBUG] telegram.ext.ExtBot: Entering: get_me
+2025-05-30 10:53:43,274 [DEBUG] telegram.ext.ExtBot: User(api_kwargs={'can_connect_to_business': False, 'has_main_web_app': False}, can_join_groups=True, can_read_all_group_messages=False, first_name='@CrsSearch', id=7805203567, is_bot=True, supports_inline_queries=True, username='CrsSearchBot')
+2025-05-30 10:53:43,274 [DEBUG] telegram.ext.ExtBot: Exiting: get_me
+2025-05-30 10:53:43,275 [DEBUG] telegram.ext.ExtBot: This Bot is already initialized.
+2025-05-30 10:53:43,373 [INFO] XML_search.enhanced.db_manager: Пул соединений успешно инициализирован
+2025-05-30 10:53:43,373 [INFO] XML_search.bot.bot_manager: База данных инициализирована
+2025-05-30 10:53:43,374 [DEBUG] telegram.ext.Updater: Updater started (polling)
+2025-05-30 10:53:43,375 [DEBUG] telegram.ext.Updater: Start network loop retry bootstrap del webhook
+2025-05-30 10:53:43,376 [DEBUG] telegram.ext.Updater: Deleting webhook
+2025-05-30 10:53:43,376 [DEBUG] telegram.ext.ExtBot: Entering: delete_webhook
+2025-05-30 10:53:43,427 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:53:43,428 [DEBUG] telegram.ext.ExtBot: Exiting: delete_webhook
+2025-05-30 10:53:43,429 [DEBUG] telegram.ext.Updater: Bootstrap done
+2025-05-30 10:53:43,430 [DEBUG] telegram.ext.Updater: Waiting for polling to start
+2025-05-30 10:53:43,430 [DEBUG] telegram.ext.Updater: Polling updates from Telegram started
+2025-05-30 10:53:43,431 [DEBUG] telegram.ext.Updater: Start network loop retry getting Updates
+2025-05-30 10:53:43,431 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:53:43,432 [INFO] telegram.ext.Application: Application started
+2025-05-30 10:53:53,586 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:53:53,587 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:53:53,588 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:53:53,588 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:54:03,660 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:54:03,660 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:54:03,662 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:54:03,664 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:54:13,718 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:54:13,719 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:54:13,720 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:54:13,721 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:54:23,771 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:54:23,772 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:54:23,773 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:54:23,774 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:54:33,825 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:54:33,825 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:54:33,826 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:54:33,827 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:54:43,880 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:54:43,880 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:54:43,882 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:54:43,884 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:54:45,873 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564966]
+2025-05-30 10:54:45,874 [DEBUG] telegram.ext.ExtBot: (Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 47, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=6, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4690, supergroup_chat_created=False, text='/start'), update_id=272564966),)
+2025-05-30 10:54:45,881 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:54:45,882 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:54:45,884 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 47, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=6, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4690, supergroup_chat_created=False, text='/start'), update_id=272564966)
+2025-05-30 10:54:45,885 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state None
+2025-05-30 10:54:45,886 [INFO] XML_search.bot.bot_manager: [FSM] menu_handler.start: user_id=5145446231
+2025-05-30 10:54:45,887 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.start] Вход: user_id=5145446231, text=/start
+2025-05-30 10:54:45,888 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Вход: user_id=5145446231, text=/start
+2025-05-30 10:54:45,889 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:54:46,070 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 47, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4691, supergroup_chat_created=False, text='⚠️ Необходима авторизация.\nПожалуйста, введите пароль:')
+2025-05-30 10:54:46,071 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:54:46,072 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Авторизация: False
+2025-05-30 10:54:46,073 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.start] Результат: States.AUTH
+2025-05-30 10:54:48,910 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564967]
+2025-05-30 10:54:48,911 [DEBUG] telegram.ext.ExtBot: (Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 50, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4692, supergroup_chat_created=False, text='123'), update_id=272564967),)
+2025-05-30 10:54:48,912 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:54:48,913 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:54:48,915 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 50, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4692, supergroup_chat_created=False, text='123'), update_id=272564967)
+2025-05-30 10:54:48,915 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.AUTH
+2025-05-30 10:54:48,917 [INFO] XML_search.bot.bot_manager: [FSM] auth_handler.auth_check: user_id=5145446231
+2025-05-30 10:54:48,918 [INFO] XML_search.bot.handlers.auth_handler: [auth_check] Вход: user_id=5145446231, text=123, state=States.AUTH
+2025-05-30 10:54:48,918 [INFO] XML_search.bot.handlers.auth_handler: [handle_message] Вход: user_id=5145446231, text=123, state=States.AUTH
+2025-05-30 10:54:48,919 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.show_main_menu] user_id=5145446231 — показ главного меню
+2025-05-30 10:54:48,919 [INFO] XML_search.bot.handlers.menu_handler: Access log: {'user_id': 5145446231, 'action': 'show_main_menu'}
+2025-05-30 10:54:48,920 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:54:49,005 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 50, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4693, supergroup_chat_created=False, text='🔍 Выберите тип поиска:')
+2025-05-30 10:54:49,007 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:54:49,008 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:54:49,082 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 50, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4694, supergroup_chat_created=False, text='Добро пожаловать! Я бот для поиска и экспорта систем координат.')
+2025-05-30 10:54:49,083 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:54:49,085 [INFO] XML_search.bot.handlers.auth_handler: Успешная авторизация пользователя 5145446231
+2025-05-30 10:54:49,087 [INFO] XML_search.bot.handlers.auth_handler: [handle_message] Успешная авторизация, возвращаю States.MAIN_MENU
+2025-05-30 10:54:49,087 [INFO] XML_search.bot.handlers.auth_handler: [auth_check] Выход: возвращаю состояние States.MAIN_MENU
+2025-05-30 10:54:50,398 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564968]
+2025-05-30 10:54:50,398 [DEBUG] telegram.ext.ExtBot: (Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 51, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4695, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564968),)
+2025-05-30 10:54:50,400 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:54:50,400 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:54:50,402 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 51, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4695, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564968)
+2025-05-30 10:54:50,402 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.MAIN_MENU
+2025-05-30 10:54:50,403 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Вход: user_id=5145446231, text=Поиск СК по описанию
+2025-05-30 10:54:50,404 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Авторизация: True
+2025-05-30 10:54:50,405 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:54:50,481 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 51, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4696, supergroup_chat_created=False, text='🔍 Как пользоваться поиском:\n\n1. Поиск по SRID:\n   - Отправьте номер системы координат\n   - Пример: 100000\n\n2. Поиск по названию:\n   - Отправьте часть названия\n   - Пример: MSK01z1\n\n3. Поиск по описанию:\n   - Отправьте часть описания\n   - Пример: Московская, Moskovskaya\n\nРезультаты будут отсортированы по релевантности:\n- Сначала точные совпадения\n- Затем частичные совпадения')
+2025-05-30 10:54:50,482 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:54:50,484 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:54:50,555 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 54, 51, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4697, reply_markup=InlineKeyboardMarkup(inline_keyboard=((InlineKeyboardButton(text='🔍 Быстрый поиск в текущем чате'),),)), supergroup_chat_created=False, text='Нажмите кнопку ниже для быстрого поиска:')
+2025-05-30 10:54:50,556 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:55:00,462 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:55:00,462 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:55:00,463 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:00,464 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:10,520 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:55:10,520 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:55:10,521 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:10,522 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:13,043 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564969]
+2025-05-30 10:55:13,044 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779211933192734'), update_id=272564969),)
+2025-05-30 10:55:13,045 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:13,046 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:13,047 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779211933192734'), update_id=272564969)
+2025-05-30 10:55:13,047 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:13,209 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:13,210 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:15,054 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564970]
+2025-05-30 10:55:15,054 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779211839679250', query='геь'), update_id=272564970),)
+2025-05-30 10:55:15,055 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:15,056 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:15,057 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779211839679250', query='геь'), update_id=272564970)
+2025-05-30 10:55:15,189 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:15,329 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:15,329 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:17,396 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564971]
+2025-05-30 10:55:17,397 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779214423352794', query='геь я'), update_id=272564971),)
+2025-05-30 10:55:17,398 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:17,399 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:17,400 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779214423352794', query='геь я'), update_id=272564971)
+2025-05-30 10:55:17,852 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:17,913 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:17,913 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:18,490 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564972]
+2025-05-30 10:55:18,491 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213400122371', query='геь ящ'), update_id=272564972),)
+2025-05-30 10:55:18,492 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:18,493 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:18,494 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213400122371', query='геь ящ'), update_id=272564972)
+2025-05-30 10:55:18,918 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:18,983 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:18,983 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:20,261 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564973]
+2025-05-30 10:55:20,262 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779215095654495', query='геь ящт'), update_id=272564973),)
+2025-05-30 10:55:20,264 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:20,265 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:20,267 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779215095654495', query='геь ящт'), update_id=272564973)
+2025-05-30 10:55:20,737 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:20,927 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:20,928 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:22,204 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564974]
+2025-05-30 10:55:22,204 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213260454149', query='геь ящту'), update_id=272564974),)
+2025-05-30 10:55:22,205 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:22,206 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:22,207 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213260454149', query='геь ящту'), update_id=272564974)
+2025-05-30 10:55:22,662 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:22,725 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:22,726 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:26,201 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564975]
+2025-05-30 10:55:26,202 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213330529355', query='геь ящту 9'), update_id=272564975),)
+2025-05-30 10:55:26,203 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:26,203 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:26,205 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213330529355', query='геь ящту 9'), update_id=272564975)
+2025-05-30 10:55:26,678 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:26,790 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:26,790 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:27,392 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564976]
+2025-05-30 10:55:27,392 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779212351967520', query='геь ящту 9т'), update_id=272564976),)
+2025-05-30 10:55:27,393 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:27,394 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:27,395 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779212351967520', query='геь ящту 9т'), update_id=272564976)
+2025-05-30 10:55:27,840 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:27,902 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:27,902 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:32,673 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564977]
+2025-05-30 10:55:32,674 [DEBUG] telegram.ext.ExtBot: (Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 55, 33, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=5, offset=3, type=<MessageEntityType.BOLD>), MessageEntity(length=5, offset=9, type=<MessageEntityType.CODE>), MessageEntity(length=9, offset=18, type=<MessageEntityType.BOLD>), MessageEntity(length=11, offset=28, type=<MessageEntityType.CODE>), MessageEntity(length=9, offset=43, type=<MessageEntityType.BOLD>), MessageEntity(length=5, offset=53, type=<MessageEntityType.CODE>), MessageEntity(length=14, offset=61, type=<MessageEntityType.BOLD>), MessageEntity(length=4, offset=76, type=<MessageEntityType.CODE>), MessageEntity(length=8, offset=84, type=<MessageEntityType.BOLD>), MessageEntity(length=33, offset=93, type=<MessageEntityType.CODE>)), from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4698, supergroup_chat_created=False, text='🔹 SRID: 32609\n📝 Название: UTM zone 9N\nℹ️ Описание: WGS84\n✅ Достоверность: EPSG\n�  Экспорт: xml_Civil3D, prj_GMv20, prj_GMv25', via_bot=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot')), update_id=272564977),)
+2025-05-30 10:55:32,674 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:32,676 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:32,677 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 55, 33, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=5, offset=3, type=<MessageEntityType.BOLD>), MessageEntity(length=5, offset=9, type=<MessageEntityType.CODE>), MessageEntity(length=9, offset=18, type=<MessageEntityType.BOLD>), MessageEntity(length=11, offset=28, type=<MessageEntityType.CODE>), MessageEntity(length=9, offset=43, type=<MessageEntityType.BOLD>), MessageEntity(length=5, offset=53, type=<MessageEntityType.CODE>), MessageEntity(length=14, offset=61, type=<MessageEntityType.BOLD>), MessageEntity(length=4, offset=76, type=<MessageEntityType.CODE>), MessageEntity(length=8, offset=84, type=<MessageEntityType.BOLD>), MessageEntity(length=33, offset=93, type=<MessageEntityType.CODE>)), from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4698, supergroup_chat_created=False, text='🔹 SRID: 32609\n📝 Название: UTM zone 9N\nℹ️ Описание: WGS84\n✅ Достоверность: EPSG\n📤 Экспорт: xml_Civil3D, prj_GMv20, prj_GMv25', via_bot=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot')), update_id=272564977)
+2025-05-30 10:55:32,678 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.SEARCH_INPUT
+2025-05-30 10:55:37,057 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564978]
+2025-05-30 10:55:37,057 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779214222210295'), update_id=272564978),)
+2025-05-30 10:55:37,058 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:37,059 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:37,061 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779214222210295'), update_id=272564978)
+2025-05-30 10:55:37,061 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:37,218 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:37,218 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:38,476 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564979]
+2025-05-30 10:55:38,477 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213681067649', query='ьыл'), update_id=272564979),)
+2025-05-30 10:55:38,478 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:38,478 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:38,479 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213681067649', query='ьыл'), update_id=272564979)
+2025-05-30 10:55:38,677 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:38,739 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:38,739 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:41,615 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564980]
+2025-05-30 10:55:41,615 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779212942345588', query='ьыл4'), update_id=272564980),)
+2025-05-30 10:55:41,616 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:41,617 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:41,619 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779212942345588', query='ьыл4'), update_id=272564980)
+2025-05-30 10:55:42,061 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:42,115 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564981]
+2025-05-30 10:55:42,115 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779215191037791', query='ьыл42'), update_id=272564981),)
+2025-05-30 10:55:42,117 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:42,118 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:42,120 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:42,120 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:42,121 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779215191037791', query='ьыл42'), update_id=272564981)
+2025-05-30 10:55:42,536 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:42,621 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:42,621 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:45,181 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564982]
+2025-05-30 10:55:45,182 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779212266274879', query='ьыл42я'), update_id=272564982),)
+2025-05-30 10:55:45,183 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:45,183 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:45,186 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779212266274879', query='ьыл42я'), update_id=272564982)
+2025-05-30 10:55:45,637 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:45,692 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:45,693 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:47,442 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564983]
+2025-05-30 10:55:47,442 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779214957498025', query='ьыл42я1'), update_id=272564983),)
+2025-05-30 10:55:47,443 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:47,444 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:55:47,445 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779214957498025', query='ьыл42я1'), update_id=272564983)
+2025-05-30 10:55:47,886 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:55:47,957 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:55:47,958 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:55:57,503 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:55:57,504 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:55:57,507 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:55:57,512 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:56:07,568 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:56:07,568 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:56:07,570 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:56:07,571 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:56:17,895 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:56:17,896 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:56:17,897 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:56:17,898 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:56:27,950 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:56:27,950 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:56:27,952 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:56:27,952 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:56:37,197 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564984]
+2025-05-30 10:56:37,198 [DEBUG] telegram.ext.ExtBot: (Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 37, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4699, supergroup_chat_created=False, text='🔙 Главное меню'), update_id=272564984),)
+2025-05-30 10:56:37,198 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:56:37,199 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:56:37,201 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 37, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4699, supergroup_chat_created=False, text='🔙 Главное меню'), update_id=272564984)
+2025-05-30 10:56:37,201 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.SEARCH_INPUT
+2025-05-30 10:56:37,202 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.show_main_menu] user_id=5145446231 — показ главного меню
+2025-05-30 10:56:37,202 [INFO] XML_search.bot.handlers.menu_handler: Access log: {'user_id': 5145446231, 'action': 'show_main_menu'}
+2025-05-30 10:56:37,203 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:56:37,379 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 38, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4700, supergroup_chat_created=False, text='🔍 Выберите тип поиска:')
+2025-05-30 10:56:37,379 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:56:37,380 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:56:37,453 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 38, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4701, supergroup_chat_created=False, text='Добро пожаловать! Я бот для поиска и экспорта систем координат.')
+2025-05-30 10:56:37,453 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:56:52,211 [DEBUG] telegram.ext.Updater: Timed out getting Updates: Timed out
+2025-05-30 10:56:52,212 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:56:53,539 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564985, 272564986, 272564987, 272564988]
+2025-05-30 10:56:53,540 [DEBUG] telegram.ext.ExtBot: (Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 40, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4702, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564985), Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 46, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4703, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564986), Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 48, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4704, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564987), Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 51, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4705, supergroup_chat_created=False, text='Поиск СК по Lat/Lon'), update_id=272564988))
+2025-05-30 10:56:53,542 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:56:53,543 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:56:53,544 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 40, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4702, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564985)
+2025-05-30 10:56:53,545 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.MAIN_MENU
+2025-05-30 10:56:53,545 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Вход: user_id=5145446231, text=Поиск СК по описанию
+2025-05-30 10:56:53,545 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Авторизация: True
+2025-05-30 10:56:53,546 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:56:55,936 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 57, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4706, supergroup_chat_created=False, text='🔍 Как пользоваться поиском:\n\n1. Поиск по SRID:\n   - Отправьте номер системы координат\n   - Пример: 100000\n\n2. Поиск по названию:\n   - Отправьте часть названия\n   - Пример: MSK01z1\n\n3. Поиск по описанию:\n   - Отправьте часть описания\n   - Пример: Московская, Moskovskaya\n\nРезультаты будут отсортированы по релевантности:\n- Сначала точные совпадения\n- Затем частичные совпадения')
+2025-05-30 10:56:55,936 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:56:55,938 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:56:56,039 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 57, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4707, reply_markup=InlineKeyboardMarkup(inline_keyboard=((InlineKeyboardButton(text='🔍 Быстрый поиск в текущем чате'),),)), supergroup_chat_created=False, text='Нажмите кнопку ниже для быстрого поиска:')
+2025-05-30 10:56:56,040 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:56:56,043 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 46, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4703, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564986)
+2025-05-30 10:56:56,044 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.SEARCH_INPUT
+2025-05-30 10:56:56,044 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Вход: user_id=5145446231, text=Поиск СК по описанию
+2025-05-30 10:56:56,044 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Авторизация: True
+2025-05-30 10:56:56,045 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:56:56,147 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 57, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4708, supergroup_chat_created=False, text='🔍 Как пользоваться поиском:\n\n1. Поиск по SRID:\n   - Отправьте номер системы координат\n   - Пример: 100000\n\n2. Поиск по названию:\n   - Отправьте часть названия\n   - Пример: MSK01z1\n\n3. Поиск по описанию:\n   - Отправьте часть описания\n   - Пример: Московская, Moskovskaya\n\nРезультаты будут отсортированы по релевантности:\n- Сначала точные совпадения\n- Затем частичные совпадения')
+2025-05-30 10:56:56,148 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:56:56,151 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:56:56,244 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 57, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4709, reply_markup=InlineKeyboardMarkup(inline_keyboard=((InlineKeyboardButton(text='🔍 Быстрый поиск в текущем чате'),),)), supergroup_chat_created=False, text='Нажмите кнопку ниже для быстрого поиска:')
+2025-05-30 10:56:56,244 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:56:56,247 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 48, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4704, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564987)
+2025-05-30 10:56:56,248 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.SEARCH_INPUT
+2025-05-30 10:56:56,251 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Вход: user_id=5145446231, text=Поиск СК по описанию
+2025-05-30 10:56:56,252 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Авторизация: True
+2025-05-30 10:56:56,252 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:56:56,507 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 57, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4710, supergroup_chat_created=False, text='🔍 Как пользоваться поиском:\n\n1. Поиск по SRID:\n   - Отправьте номер системы координат\n   - Пример: 100000\n\n2. Поиск по названию:\n   - Отправьте часть названия\n   - Пример: MSK01z1\n\n3. Поиск по описанию:\n   - Отправьте часть описания\n   - Пример: Московская, Moskovskaya\n\nРезультаты будут отсортированы по релевантности:\n- Сначала точные совпадения\n- Затем частичные совпадения')
+2025-05-30 10:56:56,507 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:56:56,509 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:56:56,585 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 57, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4711, reply_markup=InlineKeyboardMarkup(inline_keyboard=((InlineKeyboardButton(text='🔍 Быстрый поиск в текущем чате'),),)), supergroup_chat_created=False, text='Нажмите кнопку ниже для быстрого поиска:')
+2025-05-30 10:56:56,586 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:56:56,587 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 51, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4705, supergroup_chat_created=False, text='Поиск СК по Lat/Lon'), update_id=272564988)
+2025-05-30 10:56:56,589 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.SEARCH_INPUT
+2025-05-30 10:56:56,589 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Вход: user_id=5145446231, text=Поиск СК по Lat/Lon
+2025-05-30 10:56:56,590 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Авторизация: True
+2025-05-30 10:56:56,590 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:56:56,678 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 56, 57, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4712, supergroup_chat_created=False, text='📍 Введите координаты в формате \'latitude;longitude\' или \'latitude$longitude\' или \'latitude%longitude\'\n\nПоддерживаемые форматы ввода:\n1. Десятичные градусы: 55.7558;37.6173 или 55.7558$37.6173 или 55.7558%37.6173\n2. Градусы и минуты: 55 45.348;37 37.038 или 55 45.348$37 37.038 или 55 45.348%37 37.038\n3. Градусы, минуты и секунды: 55 45 20.88;37 37 2.28 или 55 45 20.88$37 37 2.28 или 55 45 20.88%37 37 2.28\n4. С обозначениями: 55°45\'20.88";37°37\'2.28" или 55°45\'20.88"$37°37\'2.28" или 55°45\'20.88"%37°37\'2.28"\n\nРазделитель между широтой и долготой - точка с запятой (;) или знак доллара ($) или знак процента (%)')
+2025-05-30 10:56:56,679 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:57:03,610 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:57:03,610 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:57:03,611 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:57:03,611 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:57:05,614 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564989]
+2025-05-30 10:57:05,615 [DEBUG] telegram.ext.ExtBot: (Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 57, 6, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4713, supergroup_chat_created=False, text='🔙 Главное меню'), update_id=272564989),)
+2025-05-30 10:57:05,616 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:57:05,618 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:57:05,619 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 57, 6, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4713, supergroup_chat_created=False, text='🔙 Главное меню'), update_id=272564989)
+2025-05-30 10:57:05,620 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.COORD_INPUT
+2025-05-30 10:57:05,620 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:57:05,817 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 57, 7, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4714, supergroup_chat_created=False, text='Вы вернулись в главное меню.')
+2025-05-30 10:57:05,817 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:57:05,818 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.show_main_menu] user_id=5145446231 — показ главного меню
+2025-05-30 10:57:05,818 [INFO] XML_search.bot.handlers.menu_handler: Access log: {'user_id': 5145446231, 'action': 'show_main_menu'}
+2025-05-30 10:57:05,818 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:57:05,893 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 57, 7, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4715, supergroup_chat_created=False, text='🔍 Выберите тип поиска:')
+2025-05-30 10:57:05,894 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:57:05,895 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:57:05,963 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 57, 7, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4716, supergroup_chat_created=False, text='Добро пожаловать! Я бот для поиска и экспорта систем координат.')
+2025-05-30 10:57:05,964 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:57:13,683 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564990]
+2025-05-30 10:57:13,684 [DEBUG] telegram.ext.ExtBot: (Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 57, 14, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4717, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564990),)
+2025-05-30 10:57:13,685 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:57:13,686 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:57:13,688 [DEBUG] telegram.ext.Application: Processing update Update(message=Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 57, 14, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), group_chat_created=False, message_id=4717, supergroup_chat_created=False, text='Поиск СК по описанию'), update_id=272564990)
+2025-05-30 10:57:13,689 [DEBUG] telegram.ext.ConversationHandler: Selecting conversation (5145446231, 5145446231) with state States.MAIN_MENU
+2025-05-30 10:57:13,691 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Вход: user_id=5145446231, text=Поиск СК по описанию
+2025-05-30 10:57:13,692 [INFO] XML_search.bot.handlers.menu_handler: [MenuHandler.handle_menu_command] Авторизация: True
+2025-05-30 10:57:13,692 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:57:13,850 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 57, 15, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4718, supergroup_chat_created=False, text='🔍 Как пользоваться поиском:\n\n1. Поиск по SRID:\n   - Отправьте номер системы координат\n   - Пример: 100000\n\n2. Поиск по названию:\n   - Отправьте часть названия\n   - Пример: MSK01z1\n\n3. Поиск по описанию:\n   - Отправьте часть описания\n   - Пример: Московская, Moskovskaya\n\nРезультаты будут отсортированы по релевантности:\n- Сначала точные совпадения\n- Затем частичные совпадения')
+2025-05-30 10:57:13,851 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:57:13,853 [DEBUG] telegram.ext.ExtBot: Entering: send_message
+2025-05-30 10:57:13,921 [DEBUG] telegram.ext.ExtBot: Message(channel_chat_created=False, chat=Chat(first_name='Александр', id=5145446231, last_name='Корниенко', type=<ChatType.PRIVATE>, username='al_kornienko'), date=datetime.datetime(2025, 5, 30, 7, 57, 15, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='@CrsSearch', id=7805203567, is_bot=True, username='CrsSearchBot'), group_chat_created=False, message_id=4719, reply_markup=InlineKeyboardMarkup(inline_keyboard=((InlineKeyboardButton(text='🔍 Быстрый поиск в текущем чате'),),)), supergroup_chat_created=False, text='Нажмите кнопку ниже для быстрого поиска:')
+2025-05-30 10:57:13,922 [DEBUG] telegram.ext.ExtBot: Exiting: send_message
+2025-05-30 10:57:18,831 [DEBUG] telegram.ext.ExtBot: Getting updates: [272564991]
+2025-05-30 10:57:18,832 [DEBUG] telegram.ext.ExtBot: (Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213320525655'), update_id=272564991),)
+2025-05-30 10:57:18,833 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:57:18,835 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:57:18,836 [DEBUG] telegram.ext.Application: Processing update Update(inline_query=InlineQuery(chat_type='sender', from_user=User(first_name='Александр', id=5145446231, is_bot=False, language_code='ru', last_name='Корниенко', username='al_kornienko'), id='3652779213320525655'), update_id=272564991)
+2025-05-30 10:57:18,836 [DEBUG] telegram.ext.ExtBot: Entering: answer_inline_query
+2025-05-30 10:57:18,943 [DEBUG] telegram.ext.ExtBot: True
+2025-05-30 10:57:18,944 [DEBUG] telegram.ext.ExtBot: Exiting: answer_inline_query
+2025-05-30 10:57:28,892 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:57:28,892 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:57:28,896 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:57:28,899 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:57:38,955 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:57:38,955 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:57:38,957 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:57:38,958 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:57:49,016 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:57:49,017 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:57:49,019 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:57:49,020 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:57:59,106 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:57:59,106 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:57:59,107 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:57:59,108 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:58:09,160 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:58:09,160 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:58:09,162 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:58:09,163 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:58:19,216 [INFO] root: Получен сигнал SIGINT (2). Начинаю корректную остановку бота...
+2025-05-30 10:58:19,217 [INFO] XML_search.bot.bot_manager: 🛑 Начинаю остановку бота...
+2025-05-30 10:58:19,219 [INFO] XML_search.bot.bot_manager: Остановка Telegram приложения...
+2025-05-30 10:58:19,220 [INFO] XML_search.bot.bot_manager: Закрытие соединений с базой данных...
+2025-05-30 10:58:19,222 [INFO] XML_search.bot.bot_manager: Сохранение финальных метрик...
+2025-05-30 10:58:19,222 [INFO] XML_search.bot.bot_manager: Очистка кэша...
+2025-05-30 10:58:19,223 [INFO] XML_search.bot.bot_manager: ✅ Бот корректно остановлен
+2025-05-30 10:58:19,223 [INFO] root: Бот корректно остановлен
+2025-05-30 10:58:19,223 [DEBUG] telegram.ext.Application: Application received stop signal. Shutting down.
+2025-05-30 10:58:19,229 [DEBUG] telegram.ext.Updater: Stopping Updater
+2025-05-30 10:58:19,229 [DEBUG] telegram.ext.Updater: Waiting background polling task to finish up.
+2025-05-30 10:58:19,232 [DEBUG] telegram.ext.Updater: Network loop retry getting Updates was cancelled
+2025-05-30 10:58:19,233 [DEBUG] telegram.ext.Updater: Calling `get_updates` one more time to mark all fetched updates as read.
+2025-05-30 10:58:19,233 [DEBUG] telegram.ext.ExtBot: Entering: get_updates
+2025-05-30 10:58:19,249 [INFO] XML_search.enhanced.db_manager: Менеджер базы данных закрыт
+2025-05-30 10:58:19,375 [DEBUG] telegram.ext.ExtBot: No new updates found.
+2025-05-30 10:58:19,376 [DEBUG] telegram.ext.ExtBot: ()
+2025-05-30 10:58:19,377 [DEBUG] telegram.ext.ExtBot: Exiting: get_updates
+2025-05-30 10:58:19,378 [DEBUG] telegram.ext.Updater: Updater.stop() is complete
+2025-05-30 10:58:19,379 [INFO] telegram.ext.Application: Application is stopping. This might take a moment.
+2025-05-30 10:58:19,379 [DEBUG] telegram.ext.Application: Waiting for update_queue to join
+2025-05-30 10:58:19,379 [DEBUG] telegram.ext.Application: Dropping pending updates
+2025-05-30 10:58:19,380 [DEBUG] telegram.ext.Application: Application stopped fetching of updates.
+2025-05-30 10:58:19,380 [DEBUG] telegram.ext.Application: Waiting for `create_task` calls to be processed
+2025-05-30 10:58:19,381 [INFO] telegram.ext.Application: Application.stop() complete
+2025-05-30 10:58:19,382 [DEBUG] telegram.ext.ExtBot: This Bot is already shut down. Returning.
+2025-05-30 10:58:19,382 [DEBUG] telegram.ext.Updater: Shut down of Updater complete
+2025-05-30 10:58:19,383 [INFO] XML_search.bot.bot_manager: Polling завершён.
+2025-05-30 10:58:19,383 [INFO] root: Завершение работы приложения

@@ -4,7 +4,7 @@
 
 from typing import Optional, List, Dict, Any
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ContextTypes, CallbackContext
+from telegram.ext import ContextTypes, CallbackContext, CommandHandler
 from XML_search.bot.handlers.base_handler import BaseHandler
 from XML_search.bot.config import BotConfig
 from XML_search.bot.states import States
@@ -42,7 +42,7 @@ class ExportHandler(BaseHandler):
             self.log_access(update.effective_user.id, 'export_command')
             # Проверяем авторизацию
             user_data = await self._get_user_data(context)
-            if not user_data.get('auth', False):
+            if not user_data.get('authenticated', False):
                 await update.effective_message.reply_text(self.messages['auth_request'])
                 await self.set_user_state(context, States.AUTH, update)
                 return
@@ -165,3 +165,12 @@ class ExportHandler(BaseHandler):
         Публичный обработчик callback-запросов формата экспорта для ConversationHandler
         """
         return await self.handle_callback(update, context) 
+        
+    def get_handler(self):
+        """
+        Получение обработчика для регистрации в BotManager
+        
+        Returns:
+            Обработчик команды /export
+        """
+        return CommandHandler("export", self.handle) 

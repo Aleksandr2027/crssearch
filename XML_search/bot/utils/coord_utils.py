@@ -9,6 +9,7 @@ import math
 from .format_utils import MessageFormatter
 from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.log_manager import LogManager
+import asyncio
 
 @dataclass
 class Coordinates:
@@ -29,18 +30,19 @@ class CoordinateParser:
     # Поддерживаемые форматы
     FORMATS = ['decimal', 'dms', 'utm']
     
-    # Регулярные выражения для разных форматов
-    PATTERNS = {
-        'decimal': r'^-?\d+\.?\d*$',
-        'dms': r'^-?\d+°\s*\d+\'\s*\d+(\.\d+)?\"?$',
-        'simple_dms': r'^-?\d+\s+\d+\s+\d+(\.\d+)?$'
-    }
-    
     def __init__(self):
         """Инициализация парсера координат"""
         self.logger = LogManager().get_logger(__name__)
         self.metrics = MetricsManager()
         self.formatter = MessageFormatter()
+        
+        # Компилируем регулярные выражения для разных форматов
+        self.patterns = {
+            'decimal': re.compile(r'^-?\d+\.?\d*$'),
+            'dms': re.compile(r'^-?\d+°\s*\d+\'\s*\d+(\.\d+)?\"?$'),
+            'simple_dms': re.compile(r'^-?\d+\s+\d+\s+\d+(\.\d+)?$'),
+            'degrees_minutes': re.compile(r'^-?\d+\s+\d+(\.\d+)?$')  # Градусы и минуты
+        }
         
     def parse(self, input_str: str) -> Coordinates:
         """
@@ -77,14 +79,11 @@ class CoordinateParser:
             # Валидируем значения
             self._validate_coordinates(lat, lon)
             
-            # Собираем метрики
-            self.metrics.increment('coordinate_parse_success')
-            
             return Coordinates(lat, lon)
             
         except Exception as e:
             self.logger.error(f"Ошибка при парсинге координат: {e}")
-            self.metrics.increment('coordinate_parse_errors')
+            asyncio.create_task(self.metrics.record_error('coordinate_parse', str(e)))
             raise ValueError(str(e))
     
     def _parse_coordinate(self, coord_str: str, coord_type: str) -> float:
@@ -101,10 +100,13 @@ class CoordinateParser:
         coord_str = coord_str.strip()
         
         # Пробуем разные форматы
-        if re.match(self.PATTERNS['decimal'], coord_str):
+        if self.patterns['decimal'].match(coord_str):
             return float(coord_str)
         
-        if re.match(self.PATTERNS['dms'], coord_str) or re.match(self.PATTERNS['simple_dms']):
+        if self.patterns['degrees_minutes'].match(coord_str):
+            return self._degrees_minutes_to_decimal(coord_str)
+        
+        if self.patterns['dms'].match(coord_str) or self.patterns['simple_dms'].match(coord_str):
             return self._dms_to_decimal(coord_str)
             
         raise ValueError(f"Неподдерживаемый формат координаты: {coord_str}")
@@ -131,6 +133,26 @@ class CoordinateParser:
         seconds = float(parts[2]) if len(parts) > 2 else 0
         
         return degrees + minutes / 60 + seconds / 3600
+    
+    def _degrees_minutes_to_decimal(self, dm_str: str) -> float:
+        """
+        Преобразование координат из формата "градусы минуты" в десятичные градусы
+        
+        Args:
+            dm_str: Строка в формате "градусы минуты" (например, "55 45.348")
+            
+        Returns:
+            Значение в десятичных градусах
+        """
+        parts = dm_str.strip().split()
+        
+        if len(parts) != 2:
+            raise ValueError("Неверный формат градусы-минуты")
+            
+        degrees = float(parts[0])
+        minutes = float(parts[1])
+        
+        return degrees + minutes / 60
     
     def _validate_coordinates(self, lat: float, lon: float) -> None:
         """

@@ -63,7 +63,7 @@ class MessageFormatter:
         # Форматируем основной текст
         text_parts = [
             MessageFormatter.format_field('SRID', str(result['srid']), MessageFormatter.EMOJI['srid']),
-            MessageFormatter.format_field('Название', result['srtext'], MessageFormatter.EMOJI['name'])
+            MessageFormatter.format_field('Название', result['name'], MessageFormatter.EMOJI['name'])
         ]
         
         # Добавляем описание если есть

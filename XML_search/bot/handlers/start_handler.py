@@ -40,7 +40,7 @@ class StartHandler(BaseHandler):
             self.log_access(update.effective_user.id, 'start_command')
             # Проверяем авторизацию
             user_data = await self._get_user_data(context)
-            if not user_data.get('auth', False):
+            if not user_data.get('authenticated', False):
                 await update.effective_message.reply_text(self.messages['start'])
                 await self.set_user_state(context, States.AUTH, update)
             else:

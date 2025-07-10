@@ -12,7 +12,7 @@ from XML_search.enhanced.config_enhanced import enhanced_config
 @dataclass
 class AuthConfig:
     """Конфигурация авторизации"""
-    PASSWORD: str = os.getenv('BOT_PASSWORD', 'default_password')
+    PASSWORD: str = os.getenv('ACCESS_PASSWORD', '123')
     MAX_ATTEMPTS: int = 3
     BLOCK_TIME: int = 300  # 5 минут
     SESSION_TIMEOUT: int = 3600  # 1 час
@@ -48,6 +48,10 @@ class BotConfig:
     HTTPS_LOG_LEVEL: str = os.getenv('HTTPS_LOG_LEVEL', 'WARNING')
     LOG_DIR: str = os.getenv('LOG_DIR', 'logs')
     
+    # Директории для файлов
+    OUTPUT_DIR: str = os.getenv('OUTPUT_DIR', 'output')
+    TEMP_DIR: str = os.getenv('TEMP_DIR', 'temp')
+    
     # Настройки кэширования
     CACHE_ENABLED: bool = os.getenv('CACHE_ENABLED', 'True').lower() == 'true'
     CACHE_TTL: int = int(os.getenv('CACHE_TTL', 3600))
@@ -56,6 +60,12 @@ class BotConfig:
     # Настройки поиска
     SEARCH_MAX_RESULTS: int = int(os.getenv('SEARCH_MAX_RESULTS', 100))
     SEARCH_TIMEOUT: int = int(os.getenv('SEARCH_TIMEOUT', 30))
+    INLINE_CACHE_DURATION: int = int(os.getenv('INLINE_CACHE_DURATION', 60))
+    DEFAULT_THUMB_URL: Optional[str] = os.getenv('DEFAULT_THUMB_URL', '')
+    
+    # Настройки Telegram Polling
+    ALLOWED_UPDATES: list[str] = field(default_factory=lambda: os.getenv('ALLOWED_UPDATES', "message,edited_message,channel_post,edited_channel_post,inline_query,chosen_inline_result,callback_query,shipping_query,pre_checkout_query,poll,poll_answer,my_chat_member,chat_member,chat_join_request").split(','))
+    DROP_PENDING_UPDATES: bool = os.getenv('DROP_PENDING_UPDATES', 'False').lower() == 'true'
     
     # Настройки базы данных
     DB_CONFIG = enhanced_config.database
@@ -89,8 +99,8 @@ class BotConfig:
     }
     
     # Настройки авторизации
-    AUTH_CONFIG: AuthConfig = field(default_factory=AuthConfig)
     ACCESS_PASSWORD: str = os.getenv('ACCESS_PASSWORD', '123')
+    AUTH_CONFIG: AuthConfig = field(default_factory=lambda: AuthConfig(PASSWORD=os.getenv('ACCESS_PASSWORD', '123')))
     
     # Telegram admin ids
     ADMIN_IDS: list = field(default_factory=lambda: [int(x) for x in os.getenv('ADMIN_IDS', '').split(',') if x.strip().isdigit()])
@@ -104,6 +114,15 @@ class BotConfig:
         'auth_blocked': 'Слишком много попыток. Попробуйте позже.',
         'error': 'Произошла ошибка: {error}',
         'help': 'Справка по командам:\n/auth - авторизация\n/search - поиск\n/export - экспорт\n/help - справка'
+    })
+    
+    # Тексты кнопок меню
+    MENU_BUTTONS: Dict[str, str] = field(default_factory=lambda: {
+        'search_coords': 'Поиск СК по Lat/Lon',
+        'search_desc': 'Поиск СК по описанию',
+        'export_results': 'Экспорт результатов',
+        'help': 'Помощь',
+        'back_to_main_menu': '🔙 Главное меню'
     })
     
     def __post_init__(self):
@@ -134,7 +153,13 @@ class BotConfig:
             raise ValueError("SEARCH_MAX_RESULTS должно быть больше 0")
         if self.SEARCH_TIMEOUT < 1:
             raise ValueError("SEARCH_TIMEOUT должно быть больше 0")
-    
+        if self.INLINE_CACHE_DURATION < 0:
+            raise ValueError("INLINE_CACHE_DURATION не может быть отрицательным")
+        
+        # Проверка для ALLOWED_UPDATES (что это список строк)
+        if not isinstance(self.ALLOWED_UPDATES, list) or not all(isinstance(item, str) for item in self.ALLOWED_UPDATES):
+            raise ValueError("ALLOWED_UPDATES должен быть списком строк")
+
     @classmethod
     def get_export_config(cls, format_name: str) -> Dict[str, Any]:
         """Получение конфигурации экспортера по имени формата"""

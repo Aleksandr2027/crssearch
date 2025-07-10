@@ -1,81 +1,40 @@
 import psycopg2
 from psycopg2.extras import DictCursor
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 from XML_search.config import DBConfig
 from XML_search.errors import DatabaseError
 from XML_search.enhanced.db_manager import DatabaseManager
-from XML_search.enhanced.log_manager import LogManager
 from XML_search.enhanced.cache_manager import CacheManager
 from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.transliterator import Transliterator
-from XML_search.enhanced.config_enhanced import LogManagerConfig, CacheManagerConfig, MetricsConfig, EnhancedConfig
 from contextlib import contextmanager
 
 class CrsSearchBot:
     """Бот для поиска систем координат"""
-    def __init__(self, db_manager: DatabaseManager):
+    def __init__(self, 
+                 db_manager: DatabaseManager,
+                 logger_instance: logging.Logger,
+                 cache_manager_instance: CacheManager,
+                 transliterator_instance: Transliterator):
         self.config = DBConfig()
-        self.connection = None
         
-        # Загрузка расширенной конфигурации
-        self.enhanced_config = EnhancedConfig.load_from_file()
-        
-        # Инициализация компонентов
         self.db_manager = db_manager
-        self.log_manager = LogManager(name="crs_search", config=self.enhanced_config.logging)
-        self.cache_manager = CacheManager(
-            ttl=self.enhanced_config.cache.ttl,
-            max_size=self.enhanced_config.cache.max_size
-        )
-        self.metrics = MetricsManager()
+        self.logger = logger_instance
+        self.cache_manager = cache_manager_instance
+        self.transliterator = transliterator_instance
         
-        self.setup_logging()
+        self.metrics = MetricsManager()
 
-    def setup_logging(self):
-        """Настройка логирования"""
-        self.logger = self.log_manager.get_logger(__name__)
-
-    @contextmanager
-    def get_connection(self):
-        """Получение соединения с базой данных"""
-        conn = None
-        try:
-            # Получаем соединение из пула
-            conn = self.db_manager.get_connection()
-            # Устанавливаем autocommit
-            conn.autocommit = True
-            self.logger.info("Успешное подключение к базе данных")
-            yield conn
-        except Exception as e:
-            self.logger.error(f"Ошибка подключения к базе данных: {str(e)}")
-            raise DatabaseError(f"Ошибка подключения к базе данных: {str(e)}")
-        finally:
-            if conn and not conn.closed:
-                # Возвращаем соединение в пул вместо закрытия
-                self.db_manager.release_connection(conn)
-                self.logger.info("Соединение возвращено в пул")
-
-    def get_cursor(self):
-        """Получение курсора базы данных"""
-        try:
-            with self.get_connection() as conn:
-                cursor = conn.cursor(cursor_factory=DictCursor)
-                return cursor
-        except Exception as e:
-            self.logger.error(f"Ошибка получения курсора: {str(e)}")
-            raise DatabaseError(f"Ошибка получения курсора: {str(e)}")
-
-    def search_coordinate_systems(self, search_variants: List[str]) -> List[Dict[str, Any]]:
+    async def search_coordinate_systems(self, search_variants: List[str]) -> List[Dict[str, Any]]:
         """Поиск систем координат по различным вариантам запроса"""
         try:
             results = []
-            seen_srids = set()  # Для дедупликации результатов
-            
+            seen_srids = set()
+
             for query in search_variants:
-                # Проверяем кэш
                 cache_key = f"search_{query}"
-                cached_results = self.cache_manager.get(cache_key)
+                cached_results = await self.cache_manager.get(cache_key)
                 if cached_results:
                     self.logger.info(f"Найдены результаты в кэше для запроса: {query}")
                     for result in cached_results:
@@ -84,36 +43,33 @@ class CrsSearchBot:
                             seen_srids.add(result['srid'])
                     continue
                 
-                # Пробуем поиск по SRID
                 try:
                     srid = int(query)
-                    srid_results = self.search_by_srid(srid)
+                    srid_results = await self.search_by_srid(srid)
                     for result in srid_results:
                         if result['srid'] not in seen_srids:
                             results.append(result)
                             seen_srids.add(result['srid'])
+                    if srid_results:
+                        await self.cache_manager.set(cache_key, srid_results)
                     continue
                 except ValueError:
-                    pass  # Не SRID, продолжаем поиск
+                    pass 
                 
-                # Поиск с учетом транслитерации
-                translit_results = self.search_with_transliteration(query)
+                translit_results = await self.search_with_transliteration(query)
                 for result in translit_results:
                     if result['srid'] not in seen_srids:
                         results.append(result)
                         seen_srids.add(result['srid'])
                 
-                # Кэшируем результаты
-                if results:
-                    self.cache_manager.set(cache_key, results)
+                if translit_results:
+                    await self.cache_manager.set(cache_key, translit_results)
             
-            # Сортируем результаты по релевантности
             results.sort(key=lambda x: x.get('relevance', 0), reverse=True)
-            
             return results
             
         except Exception as e:
-            self.logger.error(f"Ошибка при поиске систем координат: {str(e)}")
+            self.logger.error(f"Ошибка при поиске систем координат: {str(e)}", exc_info=True)
             return []
 
     def print_results(self, results: List[Dict[str, Any]]) -> None:
@@ -161,83 +117,54 @@ class CrsSearchBot:
                 print(f"\nПроизошла ошибка: {e}")
                 continue
 
-    def disconnect(self):
-        """Закрытие соединения с базой данных"""
+    async def search_with_transliteration(self, query_variant: str) -> List[Dict[str, Any]]:
+        """Поиск систем координат по одному конкретному варианту запроса (транслитерированному)"""
         try:
-            if hasattr(self, 'db_manager'):
-                self.db_manager.close()
-                self.logger.info("Соединение с базой данных закрыто")
-        except Exception as e:
-            self.logger.error(f"Ошибка отключения от базы данных: {e}")
+            self.logger.info(f"SEARCH_DEBUG_CRS: Обработка варианта в search_with_transliteration: '{query_variant}'")
+            
+            cache_key = f"translit_{query_variant}"
+            cached_results = await self.cache_manager.get(cache_key)
+            if cached_results:
+                self.logger.info(f"Найдены результаты в кэше для транслитерированного запроса: {query_variant}")
+                return cached_results
 
-    def __del__(self):
-        """Деструктор класса"""
-        self.disconnect()
+            sql_query_text = """
+                SELECT srid, auth_name, auth_srid, srtext, proj4text, 
+                       similarity(srtext, $1) as relevance
+                FROM spatial_ref_sys
+                WHERE srtext ILIKE $2 AND (auth_name = 'custom' OR (srid BETWEEN 32601 AND 32660))
+                ORDER BY relevance DESC
+                LIMIT 10
+            """
+            sql_params_tuple = (query_variant, f"%{query_variant}%")
+            log_param_display = f"($1='{query_variant}', $2='{sql_params_tuple[1]}')"
+            self.logger.info(f"SEARCH_DEBUG_CRS: SQL-запрос: {sql_query_text.strip()} \nС параметрами: {log_param_display}")
+            
+            fetched_rows = await self.db_manager.fetch(sql_query_text, query_variant, sql_params_tuple[1])
 
-    def search_with_transliteration(self, query: str) -> List[Dict[str, Any]]:
-        """Поиск систем координат с учетом транслитерации"""
-        try:
-            results = []
-            seen_srids = set()  # Для дедупликации результатов
+            self.logger.info(f"SEARCH_DEBUG_CRS: Получено {len(fetched_rows)} строк из БД для варианта '{query_variant}'")
+            current_variant_results = []
+            for row_dict in fetched_rows:
+                result = {
+                    'srid': row_dict['srid'],
+                    'auth_name': row_dict['auth_name'],
+                    'auth_srid': row_dict['auth_srid'],
+                    'srtext': row_dict['srtext'],
+                    'proj4text': row_dict['proj4text'],
+                    'relevance': float(row_dict['relevance'])
+                }
+                current_variant_results.append(result)
+                    
+            if current_variant_results:
+                await self.cache_manager.set(cache_key, current_variant_results)
             
-            # Генерируем варианты транслитерации
-            variants = self._generate_translit_variants(query)
-            
-            for variant in variants:
-                # Проверяем кэш
-                cache_key = f"translit_{variant}"
-                cached_results = self.cache_manager.get(cache_key)
-                if cached_results:
-                    self.logger.info(f"Найдены результаты в кэше для транслитерированного запроса: {variant}")
-                    for result in cached_results:
-                        if result['srid'] not in seen_srids:
-                            results.append(result)
-                            seen_srids.add(result['srid'])
-                    continue
-                
-                # Выполняем поиск в базе данных
-                with self.get_connection() as conn:
-                    with conn.cursor(cursor_factory=DictCursor) as cursor:
-                        cursor.execute("""
-                            SELECT srid, auth_name, auth_srid, srtext, proj4text, 
-                                   similarity(srtext, %s) as relevance
-                            FROM spatial_ref_sys
-                            WHERE (auth_name = 'custom' OR 
-                                  (srid BETWEEN 32601 AND 32660))
-                            AND srtext ILIKE %s
-                            ORDER BY relevance DESC
-                            LIMIT 10
-                        """, (variant, f"%{variant}%"))
-                        
-                        variant_results = []
-                        for row in cursor.fetchall():
-                            if row['srid'] not in seen_srids:
-                                result = {
-                                    'srid': row['srid'],
-                                    'auth_name': row['auth_name'],
-                                    'auth_srid': row['auth_srid'],
-                                    'srtext': row['srtext'],
-                                    'proj4text': row['proj4text'],
-                                    'relevance': float(row['relevance'])
-                                }
-                                results.append(result)
-                                variant_results.append(result)
-                                seen_srids.add(row['srid'])
-                        
-                        # Кэшируем результаты
-                        if variant_results:
-                            self.cache_manager.set(cache_key, variant_results)
-            
-            # Сортируем результаты по релевантности
-            results.sort(key=lambda x: x.get('relevance', 0), reverse=True)
-            
-            return results
+            return current_variant_results
             
         except Exception as e:
-            self.logger.error(f"Ошибка при поиске с транслитерацией: {str(e)}")
+            self.logger.error(f"Ошибка при поиске с транслитерацией для варианта '{query_variant}': {str(e)}", exc_info=True)
             return []
 
-    def search_by_srid(self, srid: int) -> List[Dict[str, Any]]:
+    async def search_by_srid(self, srid: int) -> List[Dict[str, Any]]:
         """
         Поиск координатной системы по SRID.
         
@@ -249,76 +176,61 @@ class CrsSearchBot:
         """
         try:
             cache_key = f"srid_{srid}"
-            cached_result = self.cache_manager.get(cache_key)
+            cached_result = await self.cache_manager.get(cache_key)
             if cached_result is not None:
                 return cached_result
 
-            with self.db_manager.get_connection() as conn:
-                with conn.cursor() as cursor:
-                    sql = """
-                    SELECT id, name, code, area, accuracy, datum, ellipsoid, 
-                           projection, parameters, remarks, source, revision_date,
-                           change_id, deprecated, bbox_min_lat, bbox_max_lat,
-                           bbox_min_lon, bbox_max_lon
-                    FROM coordinate_systems 
-                    WHERE code = %s
-                    """
-                    cursor.execute(sql, (srid,))
-                    row = cursor.fetchone()
-                    
-                    if row:
-                        result = [{
-                            'id': row[0],
-                            'name': row[1],
-                            'code': row[2],
-                            'area': row[3],
-                            'accuracy': row[4],
-                            'datum': row[5],
-                            'ellipsoid': row[6],
-                            'projection': row[7],
-                            'parameters': row[8],
-                            'remarks': row[9],
-                            'source': row[10],
-                            'revision_date': row[11],
-                            'change_id': row[12],
-                            'deprecated': row[13],
-                            'bbox_min_lat': row[14],
-                            'bbox_max_lat': row[15],
-                            'bbox_min_lon': row[16],
-                            'bbox_max_lon': row[17]
-                        }]
-                        # Кэшируем результат
-                        self.cache_manager.set(cache_key, result)
-                        return result
-                    
-                    return []
+            sql = """
+            SELECT srid, auth_name, auth_srid, srtext, proj4text
+            FROM spatial_ref_sys 
+            WHERE srid = $1  -- Используем $1 для asyncpg
+            """
+            row_dict = await self.db_manager.fetchrow(sql, srid)
+            
+            if row_dict:
+                result = [{
+                    'srid': row_dict['srid'],
+                    'auth_name': row_dict['auth_name'],
+                    'auth_srid': row_dict['auth_srid'],
+                    'srtext': row_dict['srtext'],
+                    'proj4text': row_dict['proj4text'],
+                    'relevance': 1.0 
+                }]
+                await self.cache_manager.set(cache_key, result)
+                return result
+            
+            return []
                     
         except Exception as e:
-            self.logger.error(f"Ошибка при поиске по SRID: {str(e)}")
-            self.metrics.increment('search_errors')
-            raise DatabaseError(f"Ошибка при поиске по SRID: {str(e)}")
+            self.logger.error(f"Ошибка при поиске по SRID: {str(e)}", exc_info=True)
+            raise DatabaseError(f"Ошибка при поиске по SRID: {str(e)}") from e
 
     def _generate_translit_variants(self, query: str) -> List[str]:
-        """Генерация вариантов транслитерации для поиска"""
+        """Генерация вариантов транслитерации для поиска (использует старую логику для совместимости, если метод еще используется)"""
         try:
-            variants = set()
-            variants.add(query)  # Добавляем оригинальный запрос
-            
-            # Добавляем транслитерированные варианты
+            # Используем новый модернизированный транслитератор
             transliterator = Transliterator()
-            transliterated = transliterator.transliterate(query)
-            if transliterated != query:
-                variants.add(transliterated)
+            # Вызываем старый метод генерации, если эта функция все еще где-то используется
+            variants = transliterator._generate_legacy_variants(query) 
             
-            # Добавляем варианты с разными регистрами
-            variants.add(query.upper())
-            variants.add(query.title())
+            # Добавляем дополнительные варианты с разными регистрами
+            additional_variants = set()
+            for variant in variants:
+                additional_variants.add(variant.upper())
+                additional_variants.add(variant.lower())
+                additional_variants.add(variant.title())
             
             # Добавляем варианты с заменой пробелов
-            variants.add(query.replace(' ', '_'))
-            variants.add(query.replace(' ', '-'))
+                additional_variants.add(variant.replace(' ', '_'))
+                additional_variants.add(variant.replace(' ', '-'))
+                additional_variants.add(variant.replace('_', ' '))
+                additional_variants.add(variant.replace('-', ' '))
             
-            return list(variants)
+            # Объединяем все варианты
+            all_variants = set(variants)
+            all_variants.update(additional_variants)
+            
+            return list(all_variants)
             
         except Exception as e:
             self.logger.error(f"Ошибка при генерации вариантов транслитерации: {str(e)}")
@@ -326,8 +238,57 @@ class CrsSearchBot:
 
 # Запуск бота
 if __name__ == "__main__":
-    bot = CrsSearchBot()
-    try:
-        bot.run_interactive()
-    finally:
-        bot.disconnect() 
+    # Для интерактивного режима создадим базовые экземпляры менеджеров
+    # В реальном приложении они должны быть настроены должным образом
+    
+    # Настройка логирования
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    main_logger = logging.getLogger("CrsSearchBotInteractive")
+
+    # Базовый CacheManager
+    cache_manager = CacheManager() 
+
+    # Transliterator
+    transliterator_instance = Transliterator()
+
+    # DatabaseManager требует конфигурацию. Предположим, что DBConfig() ее предоставляет.
+    # Для полноценной работы db_manager должен быть асинхронным и настроенным.
+    # Этот блок __main__ синхронный и run_interactive тоже.
+    # Для асинхронного db_manager и методов поиска потребуется asyncio.run().
+    # Пока оставим это как есть, понимая, что интерактивный режим в текущем виде
+    # не сможет вызывать асинхронные методы db_manager и поиска напрямую без asyncio.run().
+    # Однако, CrsSearchBot.run_interactive() сам по себе не асинхронный и вызывает
+    # self.search_coordinate_systems, который асинхронный. Это вызовет ошибку.
+    # Чтобы это реально работало, run_interactive должен быть переписан с использованием asyncio.
+    # Либо search_coordinate_systems должен быть адаптирован для синхронного вызова,
+    # что нежелательно, так как основная часть системы асинхронна.
+
+    main_logger.warning("Интерактивный режим CrsSearchBot в __main__ может не работать корректно с асинхронными методами без asyncio.run().")
+    
+    # Попытка создать db_manager, но он асинхронный, а run_interactive - нет.
+    # db_conf = DBConfig() # Предполагаем, что DBConfig читает из .env или имеет значения по умолчанию
+    # db_manager_instance = DatabaseManager(config=db_conf) # Это асинхронный менеджер
+
+    # bot = CrsSearchBot(
+    #     db_manager=db_manager_instance, # Передаем экземпляр
+    #     logger_instance=main_logger,
+    #     cache_manager_instance=cache_manager,
+    #     transliterator_instance=transliterator_instance
+    # )
+    # try:
+    #     # Для запуска асинхронного метода search_coordinate_systems из синхронного run_interactive
+    #     # нужно использовать asyncio.run() внутри run_interactive или сделать run_interactive асинхронным.
+    #     # Например, если бы search_coordinate_systems был основным, что делает run_interactive:
+    #     # import asyncio
+    #     # asyncio.run(bot.search_coordinate_systems(["мск95"])) # Пример
+    #     main_logger.info("Запуск CrsSearchBot в интерактивном режиме (ограниченная функциональность из-за синхронного контекста)...")
+    #     # bot.run_interactive() # Этот метод вызовет асинхронные операции из синхронного контекста.
+    #     main_logger.info("Интерактивный режим CrsSearchBot завершен.")
+
+    # finally:
+    #     # db_manager_instance.close() # У DatabaseManager должен быть метод close()
+    #     # Старый bot.disconnect() не нужен, так как соединения управляются db_manager
+    #     main_logger.info("Ресурсы освобождены (если это было реализовано в db_manager.close()).")
+    
+    print("Блок if __name__ == '__main__' в crs_search.py требует рефакторинга для работы с asyncio.")
+    print("Текущий интерактивный запуск из этого блока, скорее всего, не будет работать корректно.") 

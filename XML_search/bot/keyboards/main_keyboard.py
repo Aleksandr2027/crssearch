@@ -9,7 +9,6 @@ from .base_keyboard import BaseKeyboard
 # Кнопки главного меню
 BUTTON_COORD_SEARCH = 'Поиск СК по Lat/Lon'
 BUTTON_DESC_SEARCH = 'Поиск СК по описанию'
-BUTTON_MENU = '🔙 Главное меню'
 
 # Кнопки экспорта
 BUTTON_EXPORT_CIVIL3D = 'xml_Civil3D'
@@ -24,7 +23,12 @@ class MainKeyboard(BaseKeyboard):
     BUTTON_EXPORT = '/export - Экспорт результатов'
     BUTTON_HELP = '/help - Помощь'
     BUTTON_SETTINGS = '/settings - Настройки'
-    BUTTON_MENU = '🔙 Вернуться в меню'
+    BUTTON_MENU = '🔙 Главное меню'  # Исправлено - используем правильную константу
+
+    # Добавленные константы на основе логов и ошибок линтера
+    BUTTON_SEARCH_COORD = 'Поиск СК по Lat/Lon'
+    BUTTON_SEARCH_TEXT = 'Поиск СК по описанию'
+    BUTTON_DESC_SEARCH = 'Поиск СК по описанию'
     
     def get_keyboard(self) -> ReplyKeyboardMarkup:
         """
@@ -59,7 +63,7 @@ class MainKeyboard(BaseKeyboard):
             Список текстов кнопок
         """
         return [
-            cls.BUTTON_COORD_SEARCH,
+            cls.BUTTON_SEARCH_COORD,
             cls.BUTTON_DESC_SEARCH,
             cls.BUTTON_MENU
         ] 

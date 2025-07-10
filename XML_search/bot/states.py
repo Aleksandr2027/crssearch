@@ -14,6 +14,7 @@ class States(Enum):
     
     # ===== Состояния поиска =====
     SEARCH_WAITING = auto()     # Ожидание ввода поискового запроса
+    SEARCH_INPUT = auto()       # Ввод поискового запроса
     SEARCH_PROCESSING = auto()  # Обработка поискового запроса
     SEARCH_RESULTS = auto()     # Отображение результатов поиска
     SEARCH_ERROR = auto()       # Ошибка при поиске

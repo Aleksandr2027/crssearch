@@ -4,7 +4,7 @@
 
 from typing import Optional
 from telegram import Update
-from telegram.ext import ContextTypes
+from telegram.ext import ContextTypes, CommandHandler
 from XML_search.bot.handlers.base_handler import BaseHandler
 from XML_search.bot.config import BotConfig
 from XML_search.bot.states import States
@@ -51,3 +51,12 @@ class HelpHandler(BaseHandler):
             error_message = self.messages.get('error', 'Произошла ошибка. Пожалуйста, попробуйте позже.')
             if update and update.effective_message:
                 await update.effective_message.reply_text(error_message) 
+                
+    def get_handler(self):
+        """
+        Получение обработчика для регистрации в BotManager
+        
+        Returns:
+            Обработчик команды /help
+        """
+        return CommandHandler("help", self.handle) 

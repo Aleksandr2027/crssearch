@@ -100,9 +100,6 @@ class SRIDValidator(DataValidator):
                 'source': 'custom' if is_custom else 'epsg'
             }
             
-            # Собираем метрики
-            self.metrics.increment('srid_validation_success')
-            
             return ValidationResult(
                 is_valid=True,
                 normalized_value=srid,
@@ -111,7 +108,8 @@ class SRIDValidator(DataValidator):
             
         except Exception as e:
             self.logger.error(f"Ошибка при валидации SRID: {e}")
-            self.metrics.increment('srid_validation_errors')
+            import asyncio
+            asyncio.create_task(self.metrics.record_error('srid_validation', str(e)))
             return ValidationResult(
                 is_valid=False,
                 error_message=f"Ошибка валидации: {str(e)}"
@@ -160,9 +158,6 @@ class NameValidator(DataValidator):
             # Нормализация
             normalized = self._normalize_name(name)
             
-            # Собираем метрики
-            self.metrics.increment('name_validation_success')
-            
             return ValidationResult(
                 is_valid=True,
                 normalized_value=normalized
@@ -170,7 +165,8 @@ class NameValidator(DataValidator):
             
         except Exception as e:
             self.logger.error(f"Ошибка при валидации названия: {e}")
-            self.metrics.increment('name_validation_errors')
+            import asyncio
+            asyncio.create_task(self.metrics.record_error('name_validation', str(e)))
             return ValidationResult(
                 is_valid=False,
                 error_message=f"Ошибка валидации: {str(e)}"
@@ -205,9 +201,6 @@ class CoordinateValidator(DataValidator):
             # Используем существующий парсер
             coords = self.coord_parser.parse(coord_str)
             
-            # Собираем метрики
-            self.metrics.increment('coordinate_validation_success')
-            
             return ValidationResult(
                 is_valid=True,
                 normalized_value=coords,
@@ -226,7 +219,8 @@ class CoordinateValidator(DataValidator):
             
         except Exception as e:
             self.logger.error(f"Ошибка при валидации координат: {e}")
-            self.metrics.increment('coordinate_validation_errors')
+            import asyncio
+            asyncio.create_task(self.metrics.record_error('coordinate_validation', str(e)))
             return ValidationResult(
                 is_valid=False,
                 error_message=f"Ошибка валидации: {str(e)}"
@@ -286,8 +280,12 @@ class ExportValidator(DataValidator):
             if not srid_result.is_valid:
                 return srid_result
             
-            # Собираем метрики
-            self.metrics.increment('export_validation_success')
+            # Собираем метаданные
+            metadata = {
+                'requires_auth': format_info['requires_auth'],
+                'user_id': user_id,
+                'srid_info': srid_result.metadata
+            }
             
             return ValidationResult(
                 is_valid=True,
@@ -296,16 +294,13 @@ class ExportValidator(DataValidator):
                     'format': format_type,
                     'extension': format_info['extension']
                 },
-                metadata={
-                    'requires_auth': format_info['requires_auth'],
-                    'user_id': user_id,
-                    'srid_info': srid_result.metadata
-                }
+                metadata=metadata
             )
             
         except Exception as e:
             self.logger.error(f"Ошибка при валидации экспорта: {e}")
-            self.metrics.increment('export_validation_errors')
+            import asyncio
+            asyncio.create_task(self.metrics.record_error('export_validation', str(e)))
             return ValidationResult(
                 is_valid=False,
                 error_message=f"Ошибка валидации: {str(e)}"
@@ -385,7 +380,8 @@ class ValidationManager:
             
         except Exception as e:
             self.logger.error(f"Ошибка при валидации параметров поиска: {e}")
-            self.metrics.increment('search_params_validation_errors')
+            import asyncio
+            asyncio.create_task(self.metrics.record_error('search_params_validation', str(e)))
             return False
 
 def validate_srid(srid: Union[int, str]) -> bool:

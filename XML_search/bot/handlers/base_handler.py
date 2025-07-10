@@ -91,14 +91,14 @@ class BaseHandler(ABC):
                 return
                 
             # Логируем доступ
-            self.log_access(update.effective_user.id, 'update')
+            await self.log_access(update.effective_user.id, 'update')
             
             # Обрабатываем обновление
             await self.handle(update, context)
             
         except Exception as e:
             self.logger.error(f"Ошибка при обработке обновления: {e}", exc_info=True)
-            self.metrics.increment('update_error')
+            await self.metrics.record_operation('update_error', 'count')
             raise
             
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -144,16 +144,19 @@ class BaseHandler(ABC):
         if update and update.effective_message:
             await update.effective_message.reply_text(error_message)
     
-    def log_access(self, user_id: int, action: str) -> None:
+    async def log_access(self, user_id: int, action: str, details: Optional[Dict[str, Any]] = None) -> None:
         """
         Логирование доступа пользователя
         
         Args:
             user_id: ID пользователя
             action: Действие пользователя
+            details: Дополнительные детали (опционально)
         """
-        self.logger.info(f"Access log: {{'user_id': {user_id}, 'action': '{action}'}}")
-        self.metrics.increment(f'access.{action}')
+        log_data = {'user_id': user_id, 'action': action}
+        if details:
+            log_data.update(details)
+        self.logger.info(f"Access log: {log_data}")
     
     async def _ensure_user_data(self, context: CallbackContext) -> None:
         """
@@ -168,7 +171,7 @@ class BaseHandler(ABC):
                 'search_results': [],
                 'selected_srid': None,
                 'export_format': None,
-                'auth': False,
+                'authenticated': False,
                 'last_activity': time.time()
             })
     
@@ -257,5 +260,5 @@ class BaseHandler(ABC):
             yield db
         except Exception as e:
             logger.error(f"Ошибка при работе с базой данных: {e}")
-            self.metrics.increment('db_operation_errors')
+            await self.metrics.record_operation('db_operation_errors', 'count')
             raise 

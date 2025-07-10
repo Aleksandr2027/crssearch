@@ -41,3 +41,7 @@ class ExporterError(ExportError):
 class XMLProcessingError(ExportError):
     """Исключение для ошибок обработки XML"""
     pass 
+
+class CustomWktGenerationError(ExportError):
+    """Исключение для ошибок генерации WKT для пользовательских систем координат"""
+    pass 

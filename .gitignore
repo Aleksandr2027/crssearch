@@ -1,5 +1,12 @@
 # Environment variables
 .env
+*.env
+config.env
+
+# Secrets and tokens
+*token*
+*password*
+*secret*
 
 # Python
 __pycache__/
@@ -25,6 +32,9 @@ wheels/
 
 # Logs
 *.log
+logs/
+XML_search/logs/
+output/
 
 # IDE
 .vscode/*
@@ -35,8 +45,36 @@ wheels/
 
 # Virtual Environment
 venv/
+.venv/
 env/
 ENV/ 
 
+# Backups and temporary files
+backups/
+XML_search/backups/
+.backup/
+temp/
+tmp/
+*.tmp
+*.bak
+
+# Database specific
+*.db
+*.sqlite
+*.sqlite3
+
+# OS specific
+.DS_Store
+Thumbs.db
+*.pid
+
 # 7z
 *.7z
+.early.coverage
+
+# Telegram bot specific
+telegram_bot.py
+
+# Test files
+test_*.py
+XML_search/test_*.py

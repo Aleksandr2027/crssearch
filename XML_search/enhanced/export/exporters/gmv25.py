@@ -1,154 +1,243 @@
 """
-Экспортер для формата GMv25
+Экспортер PRJ-файлов для Global Mapper v25
 """
 
-from typing import Dict, Any, Optional
-from XML_search.enhanced.db_manager import DatabaseManager
-from XML_search.enhanced.metrics_manager import MetricsManager
+from typing import Dict, Any, Optional, List
+import re
+from datetime import datetime
+from .base import BaseExporter # Оставляем как есть, если BaseExporter в том же каталоге
 from XML_search.errors import ValidationError, XMLProcessingError
-from .base import BaseExporter
+# Исправленный импорт на абсолютный
+from XML_search.enhanced.db_manager_enhanced import EnhancedDatabaseManager
+from XML_search.enhanced.metrics_manager import MetricsManager
+# .prj_exporter должен быть from .prj_exporter import PRJExporter, если он в том же каталоге
+from .prj_exporter import PRJExporter
+# ..exceptions должен быть from ..exceptions import ExportError, если exceptions на уровень выше
+from ..exceptions import ExportError, CustomWktGenerationError
+from XML_search.enhanced.log_manager import LogManager
 
-class GMv25Exporter(BaseExporter):
-    """Экспортер для формата GMv25"""
+logger = LogManager().get_logger(__name__)
+
+class GMv25Exporter(PRJExporter):
+    """Экспортер PRJ-файлов для Global Mapper v25"""
     
-    def __init__(self, config: Dict[str, Any], db_manager: Optional[DatabaseManager] = None, logger: Optional[Any] = None):
-        """
-        Инициализация экспортера GMv25
-        
-        Args:
-            config: Конфигурация экспортера
-            db_manager: Опциональный менеджер базы данных
-            logger: Опциональный логгер для тестов
-        """
+    VALID_ENCODINGS = ['UTF-8', 'UTF-16', 'ASCII']
+    VALID_COORDINATE_ORDERS = ['EN', 'NE']
+    
+    def __init__(self, config: Dict[str, Any], db_manager: EnhancedDatabaseManager, output_dir: str = "output", logger_instance: Optional[Any] = None):
+        self.logger = logger_instance or LogManager().get_logger(__name__)
         try:
-            super().__init__(config, db_manager=db_manager, logger=logger)
+            super().__init__(config, db_manager=db_manager, output_dir=output_dir, logger=self.logger)
             self.metrics = MetricsManager()
             self.format_name = "prj_GMv25"
             self.logger.info("Инициализирован экспортер prj_GMv25")
         except Exception as e:
-            if logger:
-                logger.error(f"Ошибка создания DatabaseManager: {e}")
+            self.logger.error(f"Ошибка инициализации GMv25Exporter: {e}", exc_info=True)
             raise
         
-    def supports_srid(self, srid: int) -> bool:
-        """
-        Проверка поддержки SRID
-        
-        Args:
-            srid: SRID для проверки
-            
-        Returns:
-            True если SRID поддерживается, False в противном случае
-        """
-        # Временная реализация - поддерживаем все SRID для тестирования
-        return True
-        
-    async def export(self, srid: int, params: Optional[Dict[str, Any]] = None) -> str:
-        """
-        Временная реализация экспорта в формат GMv25
-        
-        Args:
-            srid: SRID системы координат
-            params: Дополнительные параметры экспорта
-            
-        Returns:
-            Сообщение об успешном экспорте
-            
-        Raises:
-            ValidationError: Если параметры экспорта невалидны
-            XMLProcessingError: При ошибке формирования XML
-        """
+    async def export(self, srid: str) -> Dict[str, Any]:
+        self.logger.debug(f"GMv25Exporter.export вызван для SRID: {srid}")
         try:
-            # Валидация входных данных
-            self._validate_srid(srid)
-            self.validate_params(params)
-            
-            with self._track_export_timing('gmv25'):
-                # Временное сообщение об успешном экспорте
-                message = (
-                    f"✅ Экспорт в формат GMv25\n"
-                    f"SRID: {srid}\n"
-                    f"Статус: Успешно\n"
-                    f"Формат: {self.config.get('display_name', 'GMv25')}\n"
-                    f"Параметры: {params if params else 'не указаны'}"
-                )
-                
-            self.metrics.increment('gmv25_export_success')
-            return message
-            
-        except ValidationError as e:
-            self.metrics.increment('gmv25_export_errors')
-            self.logger.error(f"Ошибка валидации при экспорте GMv25 для SRID {srid}: {e}")
+            result = await self._export_impl(data={'srid': srid})
+            return result
+        except ExportError as e:
+            self.logger.error(f"ExportError в GMv25Exporter.export для SRID {srid}: {e}", exc_info=True)
             raise
         except Exception as e:
-            self.metrics.increment('gmv25_export_errors')
-            self.logger.error(f"Ошибка экспорта GMv25 для SRID {srid}: {e}")
-            raise
+            self.logger.error(f"Неожиданная ошибка в GMv25Exporter.export для SRID {srid}: {e}", exc_info=True)
+            raise ExportError(f"Неожиданная ошибка при экспорте GMv25 (SRID: {srid}): {str(e)}")
+
+    def _is_custom_crs(self, srid: int) -> bool:
+        self.logger.warning(f"Метод _is_custom_crs (SRID: {srid}) в GMv25Exporter использует заглушку и требует рефакторинга для async DB.")
+        return False 
+            
+    def _get_crs_data(self, srid: int) -> Dict[str, Any]:
+        self.logger.warning(f"Метод _get_crs_data (SRID: {srid}) в GMv25Exporter использует заглушку и требует рефакторинга для async DB.")
+        raise ValidationError(f"SRID {srid} не найден в базе данных (заглушка _get_crs_data в GMv25Exporter)")
+        
+    def supports_srid(self, srid: int) -> bool:
+        return True
+        
+    def validate_params(self, params: Optional[Dict[str, Any]]) -> None:
+        if not params: return
+        if 'encoding' in params and params['encoding'] not in self.VALID_ENCODINGS:
+            raise ValidationError(f"Неверная кодировка: {params['encoding']}. Допустимые значения: {', '.join(self.VALID_ENCODINGS)}")
+        if 'coordinate_order' in params and params['coordinate_order'] not in self.VALID_COORDINATE_ORDERS:
+            raise ValidationError(f"Неверный порядок координат: {params['coordinate_order']}. Допустимые значения: {', '.join(self.VALID_COORDINATE_ORDERS)}")
+        if 'version' in params and params['version'] != '25': # Изменено на 25
+            raise ValidationError("Версия должна быть '25' для GMv25 экспортера")
+
+    def _generate_prj(self, crs_data: Dict[str, Any]) -> str:
+        try:
+            wkt_original = crs_data.get('srtext', '')
+            if not wkt_original:
+                self.logger.warning(f"Отсутствует srtext для SRID {crs_data.get('srid', 'unknown')} в GMv25Exporter._generate_prj. Будет создан пустой PRJ.")
+            wkt = self._clean_wkt(wkt_original)
+            metadata = [
+                f"# SRID: {crs_data.get('srid', 'N/A')}",
+                f"# Authority: {crs_data.get('auth_name', 'N/A')}",
+                f"# Authority SRID: {crs_data.get('auth_srid', 'N/A')}",
+                f"# Description: {crs_data.get('info', 'Not available')}",
+                f"# Reliability: {crs_data.get('reliability', 'Unknown')}",
+                f"# Export Date: {datetime.now().isoformat()}",
+                f"# Format: GlobalMapper v25 PRJ", ""
+            ]
+            return "\n".join(metadata + [wkt])
+        except Exception as e:
+            self.logger.error(f"Ошибка генерации PRJ для GMv25: {e}")
+            raise XMLProcessingError(f"Ошибка генерации PRJ для GMv25: {str(e)}")
+
+    def _clean_wkt(self, wkt: Optional[str]) -> str:
+        if not wkt: return ""
+        wkt = re.sub(r'\s+', ' ', wkt)
+        wkt = re.sub(r',\s+', ',', wkt)
+        wkt = re.sub(r'\(\s+', '(', wkt)
+        wkt = re.sub(r'\s+\)', ')', wkt)
+        return wkt.strip()
 
     def export_sync_impl(self, srid: int) -> str:
-        """
-        Синхронная реализация экспорта системы координат
-        
-        Args:
-            srid: SRID системы координат
-            
-        Returns:
-            PRJ в виде строки
-            
-        Raises:
-            ValidationError: Если SRID не поддерживается
-            XMLProcessingError: При ошибке формирования PRJ
-        """
         try:
-            # Проверяем поддержку SRID
             if not self.supports_srid(srid):
-                self.metrics.increment('gmv25_export_validation_errors')
                 raise ValidationError(f"SRID {srid} не поддерживается")
-                
-            # Получаем данные о системе координат
-            with self.db_manager.safe_cursor() as cursor:
-                cursor.execute("""
-                    SELECT srtext, auth_name, auth_srid
-                    FROM spatial_ref_sys
-                    WHERE srid = %s
-                """, (srid,))
-                result = cursor.fetchone()
-                
-            if not result:
-                raise ValidationError(f"SRID {srid} не найден в базе данных")
-                
-            srtext, auth_name, auth_srid = result
-            
-            # Формируем PRJ файл
-            prj_content = f"""PROJCS["{auth_name}:{auth_srid}",
-    GEOGCS["{auth_name}:{auth_srid}",
-        DATUM["{auth_name}",
-            SPHEROID["GRS 1980",6378137,298.257222101,
-                AUTHORITY["EPSG","7019"]],
-            AUTHORITY["EPSG","6269"]],
-        PRIMEM["Greenwich",0,
-            AUTHORITY["EPSG","8901"]],
-        UNIT["degree",0.0174532925199433,
-            AUTHORITY["EPSG","9122"]],
-        AUTHORITY["EPSG","4326"]],
-    PROJECTION["Transverse_Mercator"],
-    PARAMETER["latitude_of_origin",0],
-    PARAMETER["central_meridian",{srid % 100 * 6 - 183}],
-    PARAMETER["scale_factor",0.9996],
-    PARAMETER["false_easting",500000],
-    PARAMETER["false_northing",0],
-    UNIT["metre",1,
-        AUTHORITY["EPSG","9001"]],
-    AUTHORITY["EPSG","{srid}"]]"""
-            
-            # Обновляем метрики
-            self.metrics.increment('gmv25_export_success')
-            
-            return prj_content
-            
+            crs_data = self._get_crs_data(srid)
+            prj_str = self._generate_prj(crs_data)
+            return prj_str
         except ValidationError:
             raise
         except Exception as e:
-            self.logger.error(f"Ошибка экспорта SRID {srid}: {e}")
-            self.metrics.increment('gmv25_export_errors')
-            raise XMLProcessingError(f"Ошибка экспорта: {str(e)}")
+            self.logger.error(f"Ошибка экспорта SRID {srid} для GMv25: {e}")
+            raise XMLProcessingError(f"Ошибка экспорта для GMv25: {str(e)}")
+
+    async def _export_impl(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        srid = data.get('srid')
+        if not srid:
+            self.logger.error("SRID отсутствует в данных для экспорта (GMv25).")
+            raise ExportError("SRID не предоставлен для экспорта (GMv25).")
+        self.logger.debug(f"GMv25Exporter._export_impl вызов для SRID: {srid}")
+        try:
+            file_info = await super().export_to_file(srid=str(srid), format_type=self.format_name)
+            self.logger.info(f"Экспорт PRJ (GMv25) для SRID {srid} успешно завершен. Файл: {file_info.get('filename')}")
+            return file_info
+        except ExportError as e:
+            self.logger.error(f"Ошибка ExportError при экспорте GMv25 для SRID {srid}: {e}", exc_info=True)
+            raise
+        except Exception as e:
+            self.logger.error(f"Неожиданная ошибка при экспорте GMv25 для SRID {srid}: {e}", exc_info=True)
+            raise ExportError(f"Неожиданная ошибка при экспорте GMv25 для SRID {srid}: {str(e)}")
+
+    async def _generate_custom_wkt(self, cs_data: Dict[str, Any], exporter_version: str) -> str:
+        ERROR_MESSAGE_PARSE = "Ошибка парсинга параметров или отсутствуют необходимые ключи в proj4text."
+        ERROR_MESSAGE_DB = "Не найдены данные в вспомогательных таблицах (эллипсоид)."
+        ERROR_MESSAGE_UNKNOWN = "Неизвестная ошибка при генерации детального PRJ."
+        
+        srid = cs_data.get('srid')
+        proj4text = cs_data.get('proj4text')
+
+        if not proj4text:
+            self.logger.warning(f"Custom SRID {srid}: отсутствует proj4text. Невозможно сгенерировать детальный PRJ.")
+            raise CustomWktGenerationError(f"SRID {srid}: Недостаточно параметров для генерации PRJ. Отсутствует proj4text.")
+
+        try:
+            # Log the proj4text being parsed
+            self.logger.debug(f"Custom SRID {srid}: Parsing proj4text: '{proj4text}'")
+            
+            # ADDED: Detailed logging for proj4text and re.findall
+            self.logger.debug(f"Custom SRID {srid}: Type of proj4text: {type(proj4text)}")
+            self.logger.debug(f"Custom SRID {srid}: Raw proj4text for re.findall: {repr(proj4text)}")
+            params_list = re.findall(r'\+(.*?)=(.*?)(?:\s|$)', proj4text) # CORRECTED regex
+            self.logger.debug(f"Custom SRID {srid}: Output of re.findall (list of tuples): {params_list}")
+            params = dict(params_list)
+            # END ADDED logging
+
+            # Log the entire parsed params dictionary
+            self.logger.debug(f"Custom SRID {srid}: Parsed params: {params}") # ADDED
+            
+            # Log presence of key parameters
+            self.logger.debug(f"Custom SRID {srid}: 'ellps' in params: {'ellps' in params}")
+            self.logger.debug(f"Custom SRID {srid}: 'towgs84' in params: {'towgs84' in params}")
+                
+            if 'ellps' not in params or 'towgs84' not in params:
+                self.logger.warning(f"Custom SRID {srid}: отсутствуют 'ellps' или 'towgs84' в proj4text. Parsed params: {params}. Original proj4text: {proj4text}")
+                raise CustomWktGenerationError(f"SRID {srid}: {ERROR_MESSAGE_PARSE}")
+
+            towgs84_parts = params['towgs84'].split(',')
+            if len(towgs84_parts) != 7:
+                self.logger.warning(f"Custom SRID {srid}: параметр 'towgs84' не содержит 7 частей: {params['towgs84']}")
+                raise CustomWktGenerationError(f"SRID {srid}: {ERROR_MESSAGE_PARSE} (неверное число параметров towgs84)")
+            
+            dx, dy, dz, rx, ry, rz, s_scale = map(float, towgs84_parts)
+
+            # Для GMv25 знаки не инвертируем, в отличие от GMv20
+            # if exporter_version == "Global Mapper v20":
+            #     rx, ry, rz = -rx, -ry, -rz
+            
+            x_shift_str = f"{dx:.9f}"
+            y_shift_str = f"{dy:.9f}"
+            z_shift_str = f"{dz:.9f}"
+            x_rot_str = f"{rx:.12f}"
+            y_rot_str = f"{ry:.12f}"
+            z_rot_str = f"{rz:.12f}"
+            scale_str = f"{s_scale:.15f}"
+
+            ellps_name_param = params['ellps']
+            ellps_data_row = await self.db_manager.fetchrow(
+                "SELECT gm_ellipsoid_id, a, c FROM public.ellps_all WHERE name_el = $1",
+                ellps_name_param
+            )
+
+            if not ellps_data_row:
+                self.logger.warning(f"Custom SRID {srid}: Данные эллипсоида не найдены в 'ellps_all' для '{ellps_name_param}'.")
+                raise CustomWktGenerationError(f"SRID {srid}: {ERROR_MESSAGE_DB} (эллипсоид '{ellps_name_param}' не найден)")
+            
+            spheroid_wkt_name = ellps_data_row['gm_ellipsoid_id']
+            semi_major_axis = float(ellps_data_row['a'])
+            inverse_flattening = float(ellps_data_row['c'])
+
+            datum_param_for_query = f"+towgs84={params['towgs84']}"
+            datum_data_row = await self.db_manager.fetchrow(
+                "SELECT name_d FROM public.datum_all WHERE datum = $1",
+                datum_param_for_query
+            )
+            datum_name = datum_data_row['name_d'] if datum_data_row and datum_data_row['name_d'] else f"Custom_Datum_{srid}"
+
+            k_factor = float(params.get('k_0', params.get('k', 1.0)))
+            lon_0 = float(params.get('lon_0', 0.0))
+            lat_0 = float(params.get('lat_0', 0.0))
+            x_0 = float(params.get('x_0', 0.0))
+            y_0 = float(params.get('y_0', 0.0))
+
+            wkt = (
+                f'PROJCS["Transverse_Mercator",'
+                f'GEOGCS["{datum_name}",'
+                f'DATUM["{datum_name}",'
+                f'SPHEROID["{spheroid_wkt_name}",{semi_major_axis:.16g},{inverse_flattening:.16g}],'
+                f'TOWGS84[{x_shift_str},{y_shift_str},{z_shift_str},{x_rot_str},{y_rot_str},{z_rot_str},{scale_str}]],'
+                f'PRIMEM["Greenwich",0.0],'
+                f'UNIT["Degree",0.017453292519943295]],'
+                f'PROJECTION["Transverse_Mercator"],'
+                f'PARAMETER["latitude_of_origin",{lat_0:.16g}],'
+                f'PARAMETER["central_meridian",{lon_0:.16g}],'
+                f'PARAMETER["scale_factor",{k_factor:.16g}],'
+                f'PARAMETER["false_easting",{x_0:.16g}],'
+                f'PARAMETER["false_northing",{y_0:.16g}],'
+                f'UNIT["Meter",1.0]]'
+            )
+            return wkt
+
+        except (ValueError, KeyError) as e:
+            self.logger.warning(f"Custom SRID {srid}: Ошибка парсинга параметров proj4text или отсутствуют ключи: {e} (proj4text: {proj4text})")
+            raise CustomWktGenerationError(f"SRID {srid}: {ERROR_MESSAGE_PARSE} (детали: {e})")
+        except CustomWktGenerationError:
+            raise
+        except Exception as ex:
+            self.logger.error(f"Custom SRID {srid}: Неожиданная ошибка при генерации _generate_custom_wkt: {ex}", exc_info=True)
+            raise CustomWktGenerationError(f"SRID {srid}: {ERROR_MESSAGE_UNKNOWN} (детали: {ex})")
+
+    async def _get_prj_content(self, cs_data: Dict[str, Any], format_type: str) -> str:
+        if cs_data.get('auth_name') == 'custom':
+            self.logger.debug(f"Попытка генерации детального WKT PRJ для custom SRID: {cs_data.get('srid')}")
+            # Для GMv25Exporter версия всегда "Global Mapper v25"
+            return await self._generate_custom_wkt(cs_data, "Global Mapper v25")
+        else:
+            self.logger.debug(f"Генерация PRJ как есть (srtext) для не-custom SRID: {cs_data.get('srid')}")
+            return cs_data.get('srtext', '')

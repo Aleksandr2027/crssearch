@@ -13,9 +13,9 @@ from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.log_manager import LogManager
 from XML_search.enhanced.cache_manager import CacheManager
 from XML_search.bot.keyboards.main_keyboard import (
+    MainKeyboard,
     BUTTON_COORD_SEARCH,
     BUTTON_DESC_SEARCH,
-    BUTTON_MENU,
     BUTTON_EXPORT_CIVIL3D,
     BUTTON_EXPORT_GMV20,
     BUTTON_EXPORT_GMV25
@@ -258,7 +258,7 @@ def create_main_keyboard() -> ReplyKeyboardMarkup:
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
-def create_search_keyboard(menu_button_text: str = BUTTON_MENU) -> ReplyKeyboardMarkup:
+def create_search_keyboard(menu_button_text: str = MainKeyboard.BUTTON_MENU) -> ReplyKeyboardMarkup:
     """
     Создание клавиатуры поиска
     

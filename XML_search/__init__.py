@@ -22,8 +22,13 @@ from .enhanced.export.exporters.gmv20 import GMv20Exporter
 from .enhanced.export.exporters.gmv25 import GMv25Exporter
 from .enhanced.export.export_manager import ExportManager
 
-# Импортируем компоненты поиска
-from .core.search import SearchEngine, SearchTransliterator, SearchUtils
+# Импортируем улучшенные компоненты поиска
+from .enhanced.transliterator import Transliterator
+from .enhanced.search.search_engine import EnhancedSearchEngine
+from .enhanced.search.search_utils import SearchUtils
+
+# Импортируем компоненты поиска для обратной совместимости
+from .core.search import SearchEngine, SearchTransliterator
 
 from .bot.bot_manager import BotManager
 
@@ -35,6 +40,8 @@ __all__ = [
     'GMv25Exporter',
     'SearchEngine',
     'SearchTransliterator',
+    'EnhancedSearchEngine',
+    'Transliterator',
     'SearchUtils',
     'DatabaseError',
     'ConnectionError',

@@ -39,24 +39,23 @@ class DatabaseManager:
         try:
             async with self._lock:
                 if not self._initialized:  # Двойная проверка для избежания race condition
+                    # Подготавливаем server_settings для PostgreSQL
+                    server_settings = {
+                        'statement_timeout': str(self.config.statement_timeout),
+                        'idle_in_transaction_session_timeout': str(self.config.idle_in_transaction_session_timeout)
+                    }
+                    
                     self.pool = await asyncpg.create_pool(
                         host=self.config.host,
                         port=self.config.port,
                         user=self.config.user,
                         password=self.config.password,
                         database=self.config.dbname,
-                        min_size=self.config.pool.min_connections,
-                        max_size=self.config.pool.max_connections,
+                        min_size=self.config.min_connections,
+                        max_size=self.config.max_connections,
                         command_timeout=self.config.statement_timeout / 1000,  # конвертируем в секунды
-                        statement_timeout=self.config.statement_timeout,
                         max_inactive_connection_lifetime=self.config.pool.max_lifetime,
-                        max_inactive_connection_timeout=self.config.pool.max_idle_time,
-                        # Параметры для автоматического переподключения
-                        retry_interval=1.0,  # интервал между попытками переподключения
-                        max_retries=3,  # максимальное количество попыток
-                        # Параметры для проверки соединения
-                        health_check_interval=self.config.pool.health_check_interval,
-                        health_check_timeout=self.config.pool.health_check_timeout
+                        server_settings=server_settings
                     )
                     self._initialized = True
                     logger.info("Пул соединений успешно инициализирован")
@@ -229,6 +228,6 @@ class DatabaseManager:
         return {
             'initialized': self._initialized,
             'pool_size': self.pool.get_size() if self.pool else 0,
-            'active_connections': self.pool.get_active_size() if self.pool else 0,
+            'idle_connections': self.pool.get_idle_size() if self.pool else 0,
             'metrics': self.metrics.get_stats()
         } 

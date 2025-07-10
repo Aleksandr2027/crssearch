@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import logging
 import time
 from telegram import Update
-from telegram.ext import ContextTypes
+from telegram.ext import ContextTypes, CommandHandler
 from XML_search.bot.handlers.base_handler import BaseHandler
 from XML_search.bot.config import BotConfig
 from XML_search.bot.states import States
@@ -16,6 +16,7 @@ from XML_search.enhanced.db_manager import DatabaseManager
 from XML_search.enhanced.metrics_manager import MetricsManager
 from XML_search.enhanced.cache_manager import CacheManager
 from XML_search.enhanced.log_manager import LogManager
+import asyncio
 
 class AuthHandler(BaseHandler):
     """Обработчик авторизации"""
@@ -32,7 +33,7 @@ class AuthHandler(BaseHandler):
         self.auth_config = config.AUTH_CONFIG
         self.attempts_cache = CacheManager(ttl=self.auth_config.BLOCK_TIME)
         
-    async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> States:
         """
         Обработка команды /auth
         
@@ -41,23 +42,26 @@ class AuthHandler(BaseHandler):
             context: Контекст обновления
         """
         if not update.effective_user:
-            return
+            return States.AUTH
             
         user_id = update.effective_user.id
         
         # Проверяем, не заблокирован ли пользователь
-        if self._is_user_blocked(user_id):
+        if await self._is_user_blocked(user_id):
             await update.message.reply_text(self.messages['auth_blocked'])
-            return
+            return States.AUTH
             
         # Проверяем, авторизован ли пользователь
         if await self._is_user_authenticated(context):
             await update.message.reply_text(self.messages['auth_success'])
-            return
+            return States.MAIN_MENU
             
-        # Запрашиваем пароль
-        await self.set_user_state(context, States.AUTH, update)
-        await update.message.reply_text(self.messages['auth_required'])
+        # Проверяем, не отправляли ли уже приглашение ввести пароль
+        if not context.user_data.get('auth_prompted'):
+            await self.set_user_state(context, States.AUTH, update)
+            await update.message.reply_text(self.messages['auth_required'])
+            context.user_data['auth_prompted'] = True
+        return States.AUTH
         
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> States:
         """
@@ -78,20 +82,21 @@ class AuthHandler(BaseHandler):
             password = update.message.text
             # Проверяем пароль
             if password == self.auth_config.PASSWORD:
+                context.user_data['auth_prompted'] = False
                 await self._handle_successful_auth(update, context, user_id)
                 self.logger.info("[handle_message] Успешная авторизация, возвращаю States.MAIN_MENU")
                 return States.MAIN_MENU
             else:
-                await self._handle_failed_auth(update, context, user_id)
+                result = await self._handle_failed_auth(update, context, user_id)
                 self.logger.info("[handle_message] Неудачная попытка, возвращаю States.AUTH")
-                return States.AUTH
+                return result
         except Exception as e:
             self.logger.error(f"Ошибка в handle_message: {e}", exc_info=True)
             await self._handle_error(update, context, e)
             self.logger.info("[handle_message] Исключение, возвращаю States.AUTH")
             return States.AUTH
 
-    async def _handle_successful_auth(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int) -> None:
+    async def _handle_successful_auth(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
         """
         Обработка успешной авторизации
         
@@ -101,26 +106,27 @@ class AuthHandler(BaseHandler):
             user_id: ID пользователя
         """
         # Очищаем попытки
-        self.attempts_cache.delete(str(user_id))
+        await self.attempts_cache.delete(str(user_id))
+        
+        # Сохраняем время авторизации и статус
+        context.user_data['authenticated'] = True
+        await self._update_user_data(context, {
+            'auth_time': time.time(),
+            'authenticated': True
+        })
         
         # Обновляем состояние
         await self.set_user_state(context, States.MAIN_MENU, update)
         
-        # Сохраняем время авторизации
-        await self._update_user_data(context, {
-            'auth_time': time.time(),
-            'authenticated': True,
-            'auth': True
-        })
-        
-        # Отправляем сообщение
-        await update.message.reply_text(self.messages['auth_success'])
+        # Показываем главное меню с кнопками
+        if hasattr(self, 'menu_handler') and self.menu_handler:
+            await self.menu_handler.show_main_menu(update, context)
         
         # Логируем успешную авторизацию
         self.logger.info(f"Успешная авторизация пользователя {user_id}")
-        self.metrics.increment('auth_success')
+        await self.metrics.record_error('auth_success', 'success')
         
-    async def _handle_failed_auth(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int) -> None:
+    async def _handle_failed_auth(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int) -> States:
         """
         Обработка неудачной авторизации
         
@@ -130,32 +136,30 @@ class AuthHandler(BaseHandler):
             user_id: ID пользователя
         """
         # Увеличиваем счетчик попыток
-        attempts = self.attempts_cache.get(str(user_id)) or 0
+        attempts = await self.attempts_cache.get(str(user_id))
+        if attempts is None:
+            attempts = 0
         attempts += 1
-        self.attempts_cache.set(str(user_id), attempts)
+        await self.attempts_cache.set(str(user_id), attempts)
         
         # Проверяем, не превышен ли лимит попыток
         if attempts >= self.auth_config.MAX_ATTEMPTS:
             await update.message.reply_text(self.messages['auth_blocked'])
             self.logger.warning(f"Пользователь {user_id} заблокирован после {attempts} попыток")
-            self.metrics.increment('auth_blocked')
+            await self.metrics.record_error('auth_blocked', 'blocked')
+            return States.AUTH
         else:
             await update.message.reply_text(self.messages['auth_failed'])
             self.logger.info(f"Неудачная попытка авторизации пользователя {user_id} (попытка {attempts})")
-            self.metrics.increment('auth_failed')
+            await self.metrics.record_error('auth_failed', 'wrong password')
+            return States.AUTH
             
-    def _is_user_blocked(self, user_id: int) -> bool:
+    async def _is_user_blocked(self, user_id: int) -> bool:
         """
-        Проверка блокировки пользователя
-        
-        Args:
-            user_id: ID пользователя
-            
-        Returns:
-            bool: True если пользователь заблокирован
+        Асинхронная проверка блокировки пользователя
         """
-        attempts = self.attempts_cache.get(str(user_id))
-        return attempts and attempts >= self.auth_config.MAX_ATTEMPTS
+        attempts = await self.attempts_cache.get(str(user_id))
+        return attempts is not None and attempts >= self.auth_config.MAX_ATTEMPTS
         
     async def _is_user_authenticated(self, context: ContextTypes.DEFAULT_TYPE) -> bool:
         """
@@ -192,21 +196,21 @@ class AuthHandler(BaseHandler):
         """
         try:
             user_data = await self._get_user_data(context)
-            is_authorized = user_data.get('authorized', False)
-            
-            if not is_authorized:
-                await update.message.reply_text(
-                    "⚠️ Необходима авторизация.\n"
-                    "Пожалуйста, введите пароль:"
-                )
-                await self.set_user_state(context, States.AUTH, update)
+            is_authenticated = user_data.get('authenticated', False)
+            if not is_authenticated:
+                if not context.user_data.get('auth_prompted'):
+                    await update.message.reply_text(
+                        "⚠️ Необходима авторизация.\n"
+                        "Пожалуйста, введите пароль:"
+                    )
+                    await self.set_user_state(context, States.AUTH, update)
+                    context.user_data['auth_prompted'] = True
                 return False
-                
+            context.user_data['auth_prompted'] = False
             return True
-            
         except Exception as e:
             self.logger.error(f"Ошибка при проверке авторизации: {e}")
-            self.metrics.increment('auth.check_error')
+            await self.metrics.record_error('auth.check_error', 'check error')
             raise AuthError(f"Ошибка при проверке авторизации: {e}")
             
     async def logout(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> States:
@@ -221,8 +225,8 @@ class AuthHandler(BaseHandler):
             States: Следующее состояние диалога
         """
         try:
-            await self._update_user_data(context, {'authorized': False})
-            self.metrics.increment('auth.logout')
+            await self._update_user_data(context, {'authenticated': False})
+            await self.metrics.record_error('auth.logout', 'logout')
             
             await update.message.reply_text(
                 "👋 Вы успешно вышли из системы.\n"
@@ -232,7 +236,7 @@ class AuthHandler(BaseHandler):
             
         except Exception as e:
             self.logger.error(f"Ошибка при выходе из системы: {e}")
-            self.metrics.increment('auth.logout_error')
+            await self.metrics.record_error('auth.logout_error', 'logout error')
             raise AuthError(f"Ошибка при выходе из системы: {e}")
             
     async def check_access(self, user_id: int) -> bool:
@@ -269,11 +273,12 @@ class AuthHandler(BaseHandler):
             self.logger.error(f"Ошибка при проверке доступа: {str(e)}")
             return False 
 
-    async def auth_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    async def auth_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> States:
         """
         Публичный обработчик команды /auth для регистрации в BotManager
+        Возвращает состояние ConversationHandler.
         """
-        await self.handle(update, context) 
+        return await self.handle(update, context)
 
     async def auth_check(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> States:
         """
@@ -284,3 +289,19 @@ class AuthHandler(BaseHandler):
         result = await self.handle_message(update, context)
         self.logger.info(f"[auth_check] Выход: возвращаю состояние {result}")
         return result 
+
+    async def set_user_state(self, context, state, update=None):
+        """
+        Устанавливает состояние пользователя в user_data
+        """
+        # Обновляем только поле state, не сбрасывая другие значения
+        context.user_data['state'] = state 
+        
+    def get_handler(self):
+        """
+        Получение обработчика для регистрации в BotManager
+        
+        Returns:
+            Обработчик команды /auth
+        """
+        return CommandHandler("auth", self.auth_start) 

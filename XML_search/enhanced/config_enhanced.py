@@ -120,6 +120,26 @@ class DatabaseConfig:
         try:
             # Приведение типов до создания экземпляра
             data = dict(data)  # копия
+            
+            # Извлекаем конфигурации пула и SSL
+            pool_data = data.pop('pool', {})
+            ssl_data = data.pop('ssl', {})
+            
+            # Проверяем, где находятся поля, которые должны быть в DatabaseConfig, а не в PoolConfig
+            # Если они в pool_data, перемещаем их в основные данные
+            if 'min_connections' not in data and 'min_connections' in pool_data:
+                data['min_connections'] = pool_data['min_connections']
+            if 'max_connections' not in data and 'max_connections' in pool_data:
+                data['max_connections'] = pool_data['max_connections']
+            if 'health_check_interval' not in data and 'health_check_interval' in pool_data:
+                data['health_check_interval'] = pool_data['health_check_interval']
+            
+            # Удаляем поля из pool_data, которые не принадлежат PoolConfig
+            pool_data.pop('min_connections', None)
+            pool_data.pop('max_connections', None)
+            pool_data.pop('health_check_interval', None)
+            
+            # Приведение типов
             data['min_connections'] = int(data['min_connections'])
             data['max_connections'] = int(data['max_connections'])
             data['health_check_interval'] = int(data['health_check_interval'])
@@ -128,18 +148,13 @@ class DatabaseConfig:
             data['statement_timeout'] = int(data['statement_timeout'])
             data['idle_in_transaction_session_timeout'] = int(data['idle_in_transaction_session_timeout'])
             # ... остальные числовые поля ...
-            
-            # Извлекаем конфигурации пула и SSL
-            pool_data = data.pop('pool', {})
-            ssl_data = data.pop('ssl', {})
-            
+
             # Создаем основной объект конфигурации
-            config = cls(**data)
-            
-            # Добавляем конфигурации пула и SSL
-            config.pool = PoolConfig(**pool_data)
-            config.ssl = SSLConfig(**ssl_data)
-            
+            config = cls(
+                pool=PoolConfig(**pool_data),
+                ssl=SSLConfig(**ssl_data),
+                **data
+            )
             return config
         except Exception as e:
             raise ConfigValidationError(f"Ошибка создания DatabaseConfig: {e}")
@@ -225,6 +240,55 @@ class SearchConfig:
             raise ConfigValidationError("timeout должно быть больше 0")
 
 @dataclass
+class ConnectionPoolLimitsConfig:
+    """Конфигурация лимитов для HTTPX Connection Pool"""
+    max_connections: Optional[int] = None # Максимальное количество одновременных подключений
+    max_keepalive_connections: Optional[int] = None # Максимальное количество keep-alive соединений
+    keepalive_expiry: Optional[float] = None # Время жизни keep-alive соединения в секундах
+
+    def __post_init__(self):
+        if self.max_connections is not None:
+            self.max_connections = int(self.max_connections)
+            if self.max_connections < 1:
+                raise ConfigValidationError("max_connections в ConnectionPoolLimitsConfig должно быть больше 0, если указано")
+        if self.max_keepalive_connections is not None:
+            self.max_keepalive_connections = int(self.max_keepalive_connections)
+            if self.max_keepalive_connections < 0: # Может быть 0, если не используется
+                raise ConfigValidationError("max_keepalive_connections в ConnectionPoolLimitsConfig должно быть неотрицательным, если указано")
+        if self.keepalive_expiry is not None:
+            self.keepalive_expiry = float(self.keepalive_expiry)
+            if self.keepalive_expiry < 0:
+                raise ConfigValidationError("keepalive_expiry в ConnectionPoolLimitsConfig должно быть неотрицательным, если указано")
+
+@dataclass
+class TelegramBotConfig:
+    """Конфигурация специфичных настроек Telegram бота"""
+    connection_pool: Optional[ConnectionPoolLimitsConfig] = field(default_factory=ConnectionPoolLimitsConfig)
+    connect_timeout: Optional[float] = 10.0
+    read_timeout: Optional[float] = 20.0
+    write_timeout: Optional[float] = 10.0
+    concurrent_updates: Optional[int] = None # None означает значение по умолчанию PTB
+    rate_limiter: Optional[Dict[str, Any]] = None # Заглушка для будущей конфигурации RateLimiter
+
+    def __post_init__(self):
+        if self.connect_timeout is not None:
+            self.connect_timeout = float(self.connect_timeout)
+            if self.connect_timeout <= 0:
+                raise ConfigValidationError("connect_timeout в TelegramBotConfig должен быть положительным, если указан")
+        if self.read_timeout is not None:
+            self.read_timeout = float(self.read_timeout)
+            if self.read_timeout <= 0:
+                raise ConfigValidationError("read_timeout в TelegramBotConfig должен быть положительным, если указан")
+        if self.write_timeout is not None:
+            self.write_timeout = float(self.write_timeout)
+            if self.write_timeout <= 0:
+                raise ConfigValidationError("write_timeout в TelegramBotConfig должен быть положительным, если указан")
+        if self.concurrent_updates is not None:
+            self.concurrent_updates = int(self.concurrent_updates)
+            if self.concurrent_updates < 1:
+                 raise ConfigValidationError("concurrent_updates в TelegramBotConfig должно быть больше 0, если указано")
+
+@dataclass
 class EnhancedConfig:
     """Расширенная конфигурация"""
     config_path: str
@@ -233,6 +297,7 @@ class EnhancedConfig:
     logging: Optional[LogManagerConfig] = None
     cache: Optional[CacheManagerConfig] = None
     search: Optional[SearchConfig] = None
+    telegram_bot: Optional[TelegramBotConfig] = None # Новый атрибут
 
     def __post_init__(self):
         """Загрузка конфигурации после инициализации"""
@@ -240,10 +305,14 @@ class EnhancedConfig:
 
     def _validate_json(self, data: Dict[str, Any]) -> None:
         """Валидация структуры JSON"""
-        required_sections = {'database', 'metrics', 'logging', 'cache', 'search'}
+        required_sections = {'database', 'metrics', 'logging', 'cache', 'search'} # telegram_bot - опционален
         missing_sections = required_sections - set(data.keys())
         if missing_sections:
             raise ConfigValidationError(f"Отсутствуют обязательные секции: {missing_sections}")
+        
+        # Дополнительная валидация для опциональной секции telegram_bot, если она есть
+        if 'telegram_bot' in data and not isinstance(data['telegram_bot'], dict):
+            raise ConfigValidationError("Секция 'telegram_bot' должна быть словарем, если присутствует.")
 
     def substitute_env_vars(self, obj):
         """
@@ -282,31 +351,45 @@ class EnhancedConfig:
             data = self.substitute_env_vars(data)
 
             self._validate_json(data)
-
+                
             # Загружаем конфигурации из JSON
             if 'database' in data:
                 self.database = DatabaseConfig.from_dict(data['database'])
-            else:
+            else: # Эта ветка теперь не должна достигаться из-за _validate_json, но оставим для надежности
                 raise ConfigValidationError("Секция 'database' отсутствует в конфиге")
+            
             if 'metrics' in data:
                 self.metrics = MetricsConfig(**data['metrics'])
             else:
                 raise ConfigValidationError("Секция 'metrics' отсутствует в конфиге")
+
             if 'logging' in data:
                 self.logging = LogManagerConfig(**data['logging'])
             else:
                 raise ConfigValidationError("Секция 'logging' отсутствует в конфиге")
+
             if 'cache' in data:
                 self.cache = CacheManagerConfig(**data['cache'])
             else:
                 raise ConfigValidationError("Секция 'cache' отсутствует в конфиге")
+
             if 'search' in data:
                 self.search = SearchConfig(**data['search'])
             else:
                 raise ConfigValidationError("Секция 'search' отсутствует в конфиге")
-
+            
+            # Загрузка опциональной секции telegram_bot
+            if 'telegram_bot' in data:
+                pool_data = data['telegram_bot'].pop('connection_pool', {})
+                self.telegram_bot = TelegramBotConfig(
+                    connection_pool=ConnectionPoolLimitsConfig(**pool_data) if pool_data else None,
+                    **data['telegram_bot']
+                )
+            else:
+                self.telegram_bot = None # или TelegramBotConfig() для значений по умолчанию
+                
             logger.info("Конфигурация успешно загружена")
-
+            
         except ConfigError as e:
             logger.error(f"Ошибка конфигурации: {e}")
             raise
@@ -318,12 +401,32 @@ class EnhancedConfig:
         """Сохранение конфигурации в файл"""
         try:
             data = {
-                'database': self.database.to_dict(),
-                'metrics': self.metrics.__dict__,
-                'logging': self.logging.__dict__,
-                'cache': self.cache.__dict__,
-                'search': self.search.__dict__
+                'database': self.database.to_dict() if self.database else None,
+                'metrics': self.metrics.__dict__ if self.metrics else None,
+                'logging': self.logging.__dict__ if self.logging else None,
+                'cache': self.cache.__dict__ if self.cache else None,
+                'search': self.search.__dict__ if self.search else None,
+                'telegram_bot': None # Инициализируем как None
             }
+            if self.telegram_bot:
+                data['telegram_bot'] = {
+                    'connection_pool': self.telegram_bot.connection_pool.__dict__ if self.telegram_bot.connection_pool else None,
+                    'connect_timeout': self.telegram_bot.connect_timeout,
+                    'read_timeout': self.telegram_bot.read_timeout,
+                    'write_timeout': self.telegram_bot.write_timeout,
+                    'concurrent_updates': self.telegram_bot.concurrent_updates,
+                    'rate_limiter': self.telegram_bot.rate_limiter
+                }
+                # Убираем None значения из telegram_bot для чистоты JSON
+                current_telegram_bot_data = data['telegram_bot'] # Сохраняем ссылку
+                if current_telegram_bot_data is not None: # Дополнительная проверка для линтера
+                    data['telegram_bot'] = {k: v for k, v in current_telegram_bot_data.items() if v is not None}
+                
+                if not data['telegram_bot']: # Если все поля None, то и сам telegram_bot None
+                    data['telegram_bot'] = None
+
+            # Удаляем ключи с None значениями из верхнего уровня для чистоты JSON
+            data = {k: v for k, v in data.items() if v is not None}
             
             config_path = Path(self.config_path)
             config_path.parent.mkdir(parents=True, exist_ok=True)
