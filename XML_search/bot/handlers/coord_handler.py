@@ -204,7 +204,7 @@ class CoordHandler(BaseHandler):
                     message_text = self._format_single_result(result)
                     keyboard = CoordExportHandler.get_export_keyboard(str(srid))
                     
-                    await update.message.reply_text(
+            await update.message.reply_text(
                         text=message_text,
                         reply_markup=keyboard,
                         parse_mode=ParseMode.MARKDOWN_V2
@@ -218,7 +218,7 @@ class CoordHandler(BaseHandler):
                     "Системы координат не найдены для данных широты и долготы.",
                     reply_markup=self._main_keyboard.get_back_keyboard()
                 )
-                return States.COORD_INPUT
+            return States.COORD_INPUT
 
         except ValueError as e:
             self._logger.error(f"Ошибка при обработке координат: {e}", exc_info=True)

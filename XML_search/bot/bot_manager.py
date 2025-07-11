@@ -142,7 +142,7 @@ class BotManager:
             
             # Передаем coord_export_handler в search_handler
             self.search_handler.coord_export_handler = self.coord_export_handler
-
+            
             self.metrics.start_operation('handlers.initialized')
             self.logger.info("Все обработчики успешно инициализированы")
             
@@ -260,7 +260,7 @@ class BotManager:
         except Exception as e:
             self.logger.error(f"Ошибка при регистрации обработчиков: {e}", exc_info=True)
             raise
-
+            
     def _setup_conversation_handler(self) -> ConversationHandler:
         """Собирает и возвращает главный ConversationHandler, управляющий всеми состояниями FSM."""
         

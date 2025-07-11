@@ -76,7 +76,7 @@ class CoordExportHandler(BaseHandler):
         Если 'custom_callback_data' предоставлен, использует его. Иначе берет из query.data.
         """
         query = update.callback_query
-        
+
         # Отвечаем на callback только если он не был инициирован из другого обработчика
         if not custom_callback_data and query:
             await query.answer()
@@ -207,14 +207,14 @@ class CoordExportHandler(BaseHandler):
                             self._logger.error(f"Failed to send document: {send_error}", exc_info=True)
                             if query and query.message:
                                 await query.message.reply_text("❌ Ошибка при отправке файла.")
-                    else:
+                        else:
                         self._logger.error("Unable to determine chat_id for sending document.")
                         if query and query.message:
                             await query.message.reply_text("❌ Ошибка: не удалось определить чат для отправки файла.")
                     
                     return States.WAITING_EXPORT
-                
-                else:
+
+                    else:
                     self._logger.error(f"File NOT found at the path returned by exporter: {file_path}")
                     if query and query.message:
                         await query.message.reply_text(f"Ошибка: экспортер сообщил о создании файла, но он не найден.")
@@ -236,7 +236,7 @@ class CoordExportHandler(BaseHandler):
             if query and query.message:
                 await query.message.reply_text("Произошла непредвиденная ошибка. Попробуйте снова.")
             return States.WAITING_EXPORT
-
+    
     def get_handler(self):
         """
         Получение обработчика callback-запросов
