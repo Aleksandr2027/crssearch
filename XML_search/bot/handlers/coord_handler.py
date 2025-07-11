@@ -204,7 +204,7 @@ class CoordHandler(BaseHandler):
                     message_text = self._format_single_result(result)
                     keyboard = CoordExportHandler.get_export_keyboard(str(srid))
                     
-            await update.message.reply_text(
+                    await update.message.reply_text(
                         text=message_text,
                         reply_markup=keyboard,
                         parse_mode=ParseMode.MARKDOWN_V2
