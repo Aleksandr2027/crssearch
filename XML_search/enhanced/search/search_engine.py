@@ -105,7 +105,7 @@ class EnhancedSearchEngine:
 
         if self.logger:
             self.logger.debug(f"_get_name_and_description: srid={srid}, auth_name='{auth_name_str}' -> name='{name_to_return}', desc='{description_to_return[:100]}...'")
-            
+                
         return name_to_return, description_to_return
 
     async def search(self, query: str, filters: Optional[Dict[str, bool]] = None, 

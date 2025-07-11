@@ -744,10 +744,10 @@ class SearchHandler(BaseHandler):
         self._logger.info(f"Пользователь {update.effective_user.id} отменил поиск.")
         user_id = update.effective_user.id
         self._logger.info(f"[SearchHandler.cancel_search] user_id={user_id}")
-
+        
         if self.menu_handler:
             await self.menu_handler.show_main_menu(update, context)
-        
+
         return ConversationHandler.END
 
     def get_handler(self) -> ConversationHandler:
@@ -781,7 +781,7 @@ class SearchHandler(BaseHandler):
                 CommandHandler("cancel", self.cancel_search),
                 MessageHandler(filters.Text([back_button_text]), self.cancel_search)
             ],
-            map_to_parent={ 
+            map_to_parent={
                 ConversationHandler.END: States.MAIN_MENU,
             },
             per_user=True,
