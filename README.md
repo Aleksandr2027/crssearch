@@ -209,7 +209,7 @@ def test_coordinate_parsing():
 ### Рекомендации
 ```env
 # Используйте сильные пароли
-BOT_PASSWORD=сложный_пароль_123!
+BOT_PASSWORD=сложный_пароль!
 
 # Ограничьте доступ к БД
 DB_USER=crssearch_user  # не root/postgres
