@@ -244,6 +244,7 @@ class SearchHandler(BaseHandler):
                     OR CAST(cg.srid AS TEXT) = $3
                     OR cg.p ILIKE $4
                 )
+                AND cg.srid BETWEEN 100000 AND 101500
                 ORDER BY 
                     CASE 
                         WHEN CAST(cg.srid AS TEXT) = $5 THEN 1

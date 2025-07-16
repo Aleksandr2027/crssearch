@@ -551,19 +551,37 @@ class Transliterator:
                 variants.add(current_text)
                 return
             
-            char = current_text[position].lower()
+            # ИСПРАВЛЕНИЕ: Сначала проверяем многосимвольные замены (например "ch")
+            found_multchar_replacement = False
             
-            if char in self.digit_replacements and replacements_made < max_replacements:
-                # Применяем замену
-                for replacement in self.digit_replacements[char][:2]:  # Ограничиваем количество вариантов
-                    # Сохраняем регистр
-                    if current_text[position].isupper():
-                        replacement = replacement.upper()
-                    elif current_text[position].islower():
-                        replacement = replacement.lower()
-                    
-                    new_text = current_text[:position] + replacement + current_text[position+1:]
-                    apply_replacements(new_text, position + len(replacement), replacements_made + 1)
+            # Проверяем двухсимвольные комбинации
+            if position + 1 < len(current_text):
+                two_char = current_text[position:position+2].lower()
+                if two_char in self.digit_replacements and replacements_made < max_replacements:
+                    for replacement in self.digit_replacements[two_char][:2]:
+                        # Сохраняем регистр первого символа
+                        if current_text[position].isupper():
+                            replacement = replacement.upper()
+                        elif current_text[position].islower():
+                            replacement = replacement.lower()
+                        
+                        new_text = current_text[:position] + replacement + current_text[position+2:]
+                        apply_replacements(new_text, position + len(replacement), replacements_made + 1)
+                        found_multchar_replacement = True
+            
+            # Проверяем односимвольные замены (если не найдено многосимвольных)
+            if not found_multchar_replacement:
+                char = current_text[position].lower()
+                if char in self.digit_replacements and replacements_made < max_replacements:
+                    for replacement in self.digit_replacements[char][:2]:
+                        # Сохраняем регистр
+                        if current_text[position].isupper():
+                            replacement = replacement.upper()
+                        elif current_text[position].islower():
+                            replacement = replacement.lower()
+                        
+                        new_text = current_text[:position] + replacement + current_text[position+1:]
+                        apply_replacements(new_text, position + len(replacement), replacements_made + 1)
             
             # Продолжаем без замены
             apply_replacements(current_text, position + 1, replacements_made)
@@ -595,11 +613,24 @@ class Transliterator:
         
         return variants
     
+    def clear_cache(self):
+        """Очищает кэш транслитератора"""
+        if hasattr(self, 'generate_prioritized_variants'):
+            self.generate_prioritized_variants.cache_clear()
+        if hasattr(self, '_generate_legacy_variants'):
+            self._generate_legacy_variants.cache_clear()
+        if hasattr(self, 'detect_system_type'):
+            self.detect_system_type.cache_clear()
+        # Очищаем внутренний кэш _cache
+        if hasattr(self, '_cache'):
+            self._cache.clear()
+        self.logger.debug("Кэш транслитератора полностью очищен")
+    
     @lru_cache(maxsize=1000)
     def generate_prioritized_variants(self, query: str) -> List[Tuple[str, int]]:
         """
         Генерирует варианты с уровнями приоритета:
-        0: Оригинал и его регистровые вариации.
+        0: Оригинал и его регистровые вариации + гарантированная транслитерация кириллицы.
         1: Ошибки раскладки клавиатуры для вариантов приоритета 0.
         2: Прямая транслитерация (Латиница <-> Кириллица) для вариантов приоритета 0 и 1.
            Также включает специализированные варианты для MSK, GSK, SK и т.д.
@@ -621,6 +652,61 @@ class Transliterator:
         base_p0_variants = self._get_case_variations(query)
         for v in base_p0_variants:
             add_variant(v, 0)
+        
+        # ИСПРАВЛЕНИЕ: Гарантированная транслитерация кириллицы -> латиницы на уровне 0
+        # Это исправляет проблему с поиском "корыто", который должен находить "USK_4ertovoKoryto"
+        if re.search(r'[а-яА-Я]', query):
+            self.logger.info(f"[CYRILLIC DEBUG] Найдена кириллица в запросе: '{query}'")
+            
+            # Прямая транслитерация кириллицы в латиницу с высочайшим приоритетом
+            latin_variant = "".join(self.cyrillic_to_latin.get(char, char) for char in query)
+            self.logger.info(f"[CYRILLIC DEBUG] Прямая транслитерация: '{query}' -> '{latin_variant}'")
+            
+            if latin_variant != query and latin_variant.strip():
+                # Добавляем латинский вариант с приоритетом 0 (наивысший)
+                for latin_case_var in self._get_case_variations(latin_variant):
+                    add_variant(latin_case_var, 0)
+                    self.logger.info(f"[CYRILLIC DEBUG] Добавлен латинский вариант приоритет 0: '{latin_case_var}'")
+                    
+                # ОПТИМИЗАЦИЯ: Ограничиваем генерацию цифровых вариантов для кириллицы
+                # Генерируем только основные варианты без case variations
+                digit_variants_latin = self._apply_digit_replacements(latin_variant, max_replacements=1)
+                self.logger.info(f"[CYRILLIC DEBUG] Цифровые замены для '{latin_variant}': {digit_variants_latin}")
+                
+                # ИСПРАВЛЕНИЕ: Приоритетная сортировка - варианты с цифрами в начале идут первыми
+                sorted_digit_variants = sorted(digit_variants_latin, key=lambda x: (not x[0].isdigit(), x))
+                
+                # Добавляем только первые 7 цифровых вариантов без case variations (увеличиваем лимит)
+                added_count = 0
+                for digit_var in sorted_digit_variants:
+                    if digit_var != latin_variant and digit_var.strip() and added_count < 7:
+                        add_variant(digit_var, 0)  # Только основной вариант, без case variations
+                        added_count += 1
+                        self.logger.info(f"[CYRILLIC DEBUG] Добавлен цифровой вариант приоритет 0: '{digit_var}'")
+                    
+                # Также добавляем через метод transliterate для более точной транслитерации
+                try:
+                    precise_latin = self.transliterate(query, direction='latin')
+                    self.logger.debug(f"[ЧЕРТОВО DEBUG] Точная транслитерация: '{query}' -> '{precise_latin}'")
+                    
+                    if precise_latin != query and precise_latin != latin_variant and precise_latin.strip():
+                        for precise_case_var in self._get_case_variations(precise_latin):
+                            add_variant(precise_case_var, 0)
+                            self.logger.debug(f"[ЧЕРТОВО DEBUG] Добавлен точный вариант приоритет 0: '{precise_case_var}'")
+                            
+                        # Замены цифр для точной транслитерации
+                        digit_variants_precise = self._apply_digit_replacements(precise_latin, max_replacements=2)
+                        self.logger.debug(f"[ЧЕРТОВО DEBUG] Цифровые замены для точной '{precise_latin}': {digit_variants_precise}")
+                        
+                        for digit_var in digit_variants_precise:
+                            if digit_var != precise_latin and digit_var.strip():
+                                for digit_case_var in self._get_case_variations(digit_var):
+                                    add_variant(digit_case_var, 0)  # ИСПРАВЛЕНИЕ: Повышаем приоритет до 0
+                                    self.logger.debug(f"[ЧЕРТОВО DEBUG] Добавлен точный цифровой вариант приоритет 0: '{digit_case_var}'")
+                except Exception as e:
+                    # Если transliterate дает ошибку, игнорируем и используем простую транслитерацию
+                    self.logger.debug(f"[ЧЕРТОВО DEBUG] Ошибка точной транслитерации: {e}")
+                    pass
         
         # Варианты, для которых будем генерить следующие уровни
         variants_for_level_1 = list(all_variants_map.keys()) # Все с приоритетом 0
@@ -658,6 +744,18 @@ class Transliterator:
                 special_handler_results.update(self.process_usk_usl_variants(p_prev_var))
             elif current_system_type == 'UTM':
                 special_handler_results.update(self.process_utm_patterns(p_prev_var))
+            elif current_system_type == 'UNKNOWN':
+                # НОВОЕ: Обработка неопознанных типов (например "черт" -> "4ert")
+                # ИСПРАВЛЕНИЕ: Повышаем приоритет для неопознанных типов с заменами цифр
+                unknown_variants = self._process_unknown_variants(p_prev_var)
+                special_handler_results.update(unknown_variants)
+                
+                # КРИТИЧНО: Варианты с заменами цифр получают приоритет 1 вместо 2
+                # для лучшего ранжирования в поиске (особенно важно для USK систем)
+                for unknown_var in unknown_variants:
+                    if any(digit in unknown_var for digit in ['4', '3', '0', '1', '7']):
+                        # Добавляем важные варианты с цифрами на приоритет 1
+                        add_variant(unknown_var, 1)
             
             for v_special in special_handler_results:
                  for vc_special in self._get_case_variations(v_special): # И для них тоже регистр
@@ -709,6 +807,18 @@ class Transliterator:
         final_prioritized_list = sorted(all_variants_map.items(), key=lambda item: (item[1], item[0]))
         
         self.logger.debug(f"Сгенерированные варианты для '{query}': {final_prioritized_list[:20]}... (всего {len(final_prioritized_list)})") # Логируем только часть
+        
+        # ЧЕРТОВО DEBUG: Детальное логирование для отладки
+        if 'чертово' in query.lower() or 'chertovo' in query.lower():
+            self.logger.debug(f"[ЧЕРТОВО DEBUG] ФИНАЛЬНЫЕ ВАРИАНТЫ для '{query}': {len(final_prioritized_list)} штук")
+            for i, (variant, priority) in enumerate(final_prioritized_list[:15]):
+                self.logger.debug(f"[ЧЕРТОВО DEBUG]   {i+1}. '{variant}' (приоритет {priority})")
+        
+        # КОРЫТО INFO: Отладка для корыто с уровнем INFO
+        if 'корыто' in query.lower() or 'koryto' in query.lower():
+            self.logger.info(f"[КОРЫТО INFO] ФИНАЛЬНЫЕ ВАРИАНТЫ для '{query}': {len(final_prioritized_list)} штук")
+            for i, (variant, priority) in enumerate(final_prioritized_list[:15]):
+                self.logger.info(f"[КОРЫТО INFO]   {i+1}. '{variant}' (приоритет {priority})")
         
         # Ограничиваем количество возвращаемых вариантов, если нужно
         return final_prioritized_list[:15] # УМЕНЬШЕН ЛИМИТ до 15
@@ -921,6 +1031,64 @@ class Transliterator:
             variants.update(['utm', 'UTM', 'утм', 'УТМ'])
         elif part_lower == 'я':
             variants.update(['z', 'Z', 'з', 'З'])
+        
+        return variants
+    
+    def _process_unknown_variants(self, text: str) -> Set[str]:
+        """
+        Обработка неопознанных типов систем координат (важно для USK систем)
+        
+        Args:
+            text: Исходный текст
+            
+        Returns:
+            Множество вариантов для неопознанных типов
+        """
+        variants = set()
+        
+        # Базовые транслитерации
+        # Если текст содержит кириллицу, транслитерируем в латиницу
+        translit_to_latin = self.transliterate(text, 'ru') if re.search(r'[а-яА-Я]', text) else text
+        # Если текст содержит латиницу, транслитерируем в кириллицу  
+        translit_to_cyrillic = self.transliterate(text, 'en') if re.search(r'[a-zA-Z]', text) else text
+        
+        variants.add(translit_to_latin)
+        variants.add(translit_to_cyrillic)
+        
+        # ОТЛАДКА: Логируем базовые транслитерации
+        if self.logger and hasattr(self.logger, 'debug'):
+            self.logger.debug(f"_process_unknown_variants: '{text}' -> latin='{translit_to_latin}', cyrillic='{translit_to_cyrillic}'")
+        
+        # ИСПРАВЛЕНИЕ: Замены цифр применяем к ИСХОДНОМУ тексту И к транслитерированным вариантам
+        digit_variants_original = self._apply_digit_replacements(text, max_replacements=3)
+        variants.update(digit_variants_original)
+        
+        # КРИТИЧНО: Применяем замены к транслитерированным вариантам (например "chert" -> "4ert")
+        if translit_to_latin != text:
+            digit_variants_latin = self._apply_digit_replacements(translit_to_latin, max_replacements=3)
+            variants.update(digit_variants_latin)
+            # ОТЛАДКА: Логируем замены цифр для транслитерированного варианта
+            if self.logger and hasattr(self.logger, 'debug') and digit_variants_latin:
+                self.logger.debug(f"_process_unknown_variants: digit replacements for '{translit_to_latin}' -> {sorted(list(digit_variants_latin)[:5])}")
+        
+        if translit_to_cyrillic != text:
+            digit_variants_cyrillic = self._apply_digit_replacements(translit_to_cyrillic, max_replacements=3)
+            variants.update(digit_variants_cyrillic)
+        
+        # Обработка разделителей
+        variants.update(self.process_separators(text))
+        
+        # Обработка географических сокращений
+        variants.update(self._apply_geographic_abbreviations(text))
+        
+        # Применяем координатные аббревиатуры
+        variants.update(self._apply_coordinate_abbreviations(text))
+        
+        # ОТЛАДКА: Логируем финальные варианты
+        if self.logger and hasattr(self.logger, 'debug'):
+            variant_list = sorted(list(variants))
+            has_4ertovo = any("4ertovo" in v.lower() for v in variant_list)
+            self.logger.debug(f"_process_unknown_variants: '{text}' final variants ({len(variant_list)}): {variant_list[:10]}, has_4ertovo={has_4ertovo}")
         
         return variants
     

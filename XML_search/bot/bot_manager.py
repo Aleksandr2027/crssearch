@@ -272,6 +272,9 @@ class BotManager:
         self.menu_handler.coord_export_handler = self.coord_export_handler
         self.menu_handler.search_handler = self.search_handler
         
+        # Устанавливаем обратные ссылки для возврата в главное меню
+        self.coord_handler.menu_handler = self.menu_handler
+        
         conv_handler = ConversationHandler(
             entry_points=[
                 CommandHandler("start", self.menu_handler.start),
@@ -284,6 +287,7 @@ class BotManager:
                 States.AUTH: [MessageHandler(filters.TEXT & ~filters.COMMAND, self.auth_handler.auth_check)],
                 States.COORD_INPUT: [MessageHandler(filters.TEXT & ~filters.COMMAND, self.coord_handler.handle_coord_input)],
                 States.WAITING_EXPORT: [
+                    CallbackQueryHandler(self.coord_handler.handle_coord_callback, pattern=r'^coord_.*'),
                     CallbackQueryHandler(self.coord_export_handler.handle_export_callback, pattern=r'^export_.*'),
                 ],
                 States.SEARCH_INPUT: [

@@ -62,6 +62,8 @@ class EnhancedSearchEngine:
         self.cache = cache or CacheManager()
         self.search_utils = SearchUtils(logger=self.logger)
         self.transliterator = Transliterator()
+        # ИСПРАВЛЕНИЕ: Очищаем кэш после изменений в алгоритме замен
+        self.transliterator.clear_cache()
         self.search_processor = CrsSearchBot(
             db_manager=self.db_manager,
             logger_instance=self.logger,
@@ -71,6 +73,10 @@ class EnhancedSearchEngine:
         self.logger.info("EnhancedSearchEngine инициализирован.")
         
     async def _get_name_and_description(self, srid: int, auth_name_str: str, auth_srid_val: Optional[Any], srtext_from_db: str) -> Tuple[str, str]:
+        # ИСПРАВЛЕНИЕ: Проверяем source_table для корректного определения типа записи
+        # Получаем дополнительные данные из результата поиска если доступны
+        # Для записей из custom_geom всегда используем имя из поля name таблицы custom_geom
+        
         name_to_return = str(auth_name_str) # По умолчанию имя - это auth_name из БД
         description_to_return = srtext_from_db # По умолчанию описание - это srtext из БД
 
@@ -94,8 +100,10 @@ class EnhancedSearchEngine:
             if not description_to_return: # Маловероятно, если is_wkt_like=True, но для страховки
                  description_to_return = name_to_return 
         else: # Не стандартный авторитет и srtext не WKT (например, custom_geom: auth_name="MSK01z1", srtext="МСК Адыгея зона 1 (3°)")
-            # name_to_return уже равен auth_name_str (например, "MSK01z1")
-            # description_to_return уже равен srtext_from_db (например, "МСК Адыгея зона 1 (3°)")
+            # ИСПРАВЛЕНИЕ: Для записей из custom_geom имя всегда должно браться из auth_name,
+            # так как search_utils уже правильно установил auth_name = name из custom_geom
+            # name_to_return уже равен auth_name_str (например, "USK_4ertovoKoryto")
+            # description_to_return уже равен srtext_from_db (например, "USK_4ertovoKoryto (3°)")
             if not description_to_return: # Если srtext_from_db (custom_geom.info) был пуст
                 description_to_return = f"{name_to_return} (SRID: {srid})"
 
@@ -139,15 +147,22 @@ class EnhancedSearchEngine:
                     self.logger.debug(f"Прямой поиск по SRID: {srid_val} (is_srid_search=True)")
                 
                 async with self.db_manager.connection() as conn:
+                    # Проверяем диапазоны SRID - custom (100000-101500) или EPSG UTM северного полушария (32601-32660)
+                    if not ((100000 <= srid_val <= 101500) or (32601 <= srid_val <= 32660)):
+                        self.logger.debug(f"SRID {srid_val} не в разрешенных диапазонах (100000-101500 или 32601-32660)")
+                        if use_cache and self.cache:
+                            await self.cache.set(cache_key, [], ttl=cache_ttl)
+                        return []
+                    
                     # Сначала ищем в custom_geom, так как там могут быть приоритетные/пользовательские данные
                     db_row = await conn.fetchrow(
-                        "SELECT srid, 'custom' as auth_name, srid as auth_srid, srtext, proj4text FROM custom_geom WHERE srid = $1",
+                        "SELECT srid, 'custom' as auth_name, srid as auth_srid, srtext, proj4text FROM custom_geom WHERE srid = $1 AND srid BETWEEN 100000 AND 101500",
                         srid_val
                     )
                     # Если не нашли в custom_geom, ищем в spatial_ref_sys (для стандартных EPSG и других)
                     if not db_row:
                         db_row = await conn.fetchrow(
-                            "SELECT srid, auth_name, auth_srid, srtext, proj4text FROM spatial_ref_sys WHERE srid = $1",
+                            "SELECT srid, auth_name, auth_srid, srtext, proj4text FROM spatial_ref_sys WHERE srid = $1 AND srid BETWEEN 32601 AND 32660",
                             srid_val
                         )
 

@@ -2,7 +2,7 @@
 Улучшенные утилиты для поиска
 """
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from Levenshtein import ratio
 import logging
 from XML_search.enhanced.db_manager import DatabaseManager # Убедитесь, что этот импорт корректен
@@ -72,7 +72,7 @@ class SearchUtils:
                 f"       'custom' AS type, "  # Используем 'custom' как значение для type
                 f"       CAST('custom_geom' AS TEXT) as source_table "
                 f" FROM custom_geom "\
-                f" WHERE ({' OR '.join(cg_wheres)}))"\
+                f" WHERE ({' OR '.join(cg_wheres)}) AND (srid BETWEEN 100000 AND 101500))"\
             )
             # params_custom (параметры для cg_wheres) должны быть уже заполнены выше
 
@@ -91,7 +91,7 @@ class SearchUtils:
         spatial_ref_sys_query_part = ""
         if srs_wheres:
             srs_params_count = len(srs_wheres)
-            spatial_ref_sys_query_part = f"SELECT srid, auth_name, auth_srid, srtext, CAST(NULL AS TEXT) as name, CAST(NULL AS TEXT) as info, CAST(NULL AS TEXT) as type, CAST('spatial_ref_sys' AS TEXT) as source_table FROM spatial_ref_sys WHERE ({' OR '.join(srs_wheres)})"
+            spatial_ref_sys_query_part = f"SELECT srid, auth_name, auth_srid, srtext, CAST(NULL AS TEXT) as name, CAST(NULL AS TEXT) as info, CAST(NULL AS TEXT) as type, CAST('spatial_ref_sys' AS TEXT) as source_table FROM spatial_ref_sys WHERE ({' OR '.join(srs_wheres)}) AND (srid BETWEEN 32601 AND 32660)"
             params_spatial.extend([f"%{variant}%"] * srs_params_count)
         
         # --- Combine queries ---
@@ -108,7 +108,7 @@ class SearchUtils:
             if "srid" in search_fields: reindexed_srs_wheres.append(f"CAST(srid AS TEXT) ILIKE ${srs_param_idx_start + len(reindexed_srs_wheres)}")
             
             if reindexed_srs_wheres: # Только если есть что искать в srs
-                spatial_ref_sys_query_part_reindexed = f"SELECT srid, auth_name, auth_srid, srtext, CAST(NULL AS TEXT) as name, CAST(NULL AS TEXT) as info, CAST(NULL AS TEXT) as type, CAST('spatial_ref_sys' AS TEXT) as source_table FROM spatial_ref_sys WHERE ({' OR '.join(reindexed_srs_wheres)})"
+                spatial_ref_sys_query_part_reindexed = f"SELECT srid, auth_name, auth_srid, srtext, CAST(NULL AS TEXT) as name, CAST(NULL AS TEXT) as info, CAST(NULL AS TEXT) as type, CAST('spatial_ref_sys' AS TEXT) as source_table FROM spatial_ref_sys WHERE ({' OR '.join(reindexed_srs_wheres)}) AND (srid BETWEEN 32601 AND 32660)"
                 full_query = f"({custom_geom_query_part}) UNION ALL ({spatial_ref_sys_query_part_reindexed})"
             else: # Если в srs нечего искать, используем только custom_geom
                  full_query = custom_geom_query_part
@@ -124,10 +124,25 @@ class SearchUtils:
             if limit > 0:
                 full_query += f" LIMIT {limit}"
             
+            # Добавляем специальную отладку для 4ertovo ПЕРЕД выполнением
+            if "4ertovo" in variant.lower() or "chert" in variant.lower():
+                self.logger.info(f"[4ERTOVO DEBUG] Выполняю запрос для термина: '{variant}'")
+                self.logger.info(f"[4ERTOVO DEBUG] SQL: {full_query}")
+                self.logger.info(f"[4ERTOVO DEBUG] Параметры: {params}")
+                self.logger.info(f"[4ERTOVO DEBUG] Поля поиска: {search_fields}")
+            
             try:
                 async with db_manager.connection() as conn: # Используем connection()
                     # self.logger.debug(f"Executing combined search query: {full_query} with params: {params}")
                     db_results = await conn.fetch(full_query, *params) # Используем conn.fetch и распаковку параметров
+                    
+                    # Отладка результатов для 4ertovo
+                    if "4ertovo" in variant.lower() or "chert" in variant.lower():
+                        self.logger.info(f"[4ERTOVO DEBUG] Получено результатов: {len(db_results) if db_results else 0}")
+                        if db_results:
+                            for i, row in enumerate(db_results[:3]):  # Показываем первые 3 результата
+                                self.logger.info(f"[4ERTOVO DEBUG] Результат {i+1}: {dict(row)}")
+                    
                     if db_results:
                         results.extend([dict(row) for row in db_results]) # Преобразуем строки в словари
             except Exception as e:

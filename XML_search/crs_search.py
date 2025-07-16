@@ -183,7 +183,7 @@ class CrsSearchBot:
             sql = """
             SELECT srid, auth_name, auth_srid, srtext, proj4text
             FROM spatial_ref_sys 
-            WHERE srid = $1  -- Используем $1 для asyncpg
+            WHERE srid = $1 AND (srid BETWEEN 32601 AND 32660)  -- Используем $1 для asyncpg, ограничиваем диапазон
             """
             row_dict = await self.db_manager.fetchrow(sql, srid)
             
